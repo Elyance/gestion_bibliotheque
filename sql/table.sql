@@ -160,7 +160,7 @@ CREATE TABLE Retour(
 CREATE TABLE Penalite(
    idPenalite INT,
    nbJourPenalite INT NOT NULL,
-   date_ DATE NOT NULL,
+   date DATE NOT NULL,
    idPret INT NOT NULL,
    PRIMARY KEY(idPenalite),
    UNIQUE(idPret),
