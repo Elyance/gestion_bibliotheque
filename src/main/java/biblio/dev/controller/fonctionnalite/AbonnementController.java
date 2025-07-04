@@ -23,9 +23,6 @@ public class AbonnementController {
     @Autowired
     private AbonnementService abonnementService;
 
-    @Autowired
-    private AdherantService adherantService;
-
     @GetMapping("/abonnement-adherent")
     public String formulaireAbonnementAdherent(Model model) {
         return "abonnement-adherant";
