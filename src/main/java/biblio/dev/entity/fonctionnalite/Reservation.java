@@ -3,6 +3,7 @@ package biblio.dev.entity.fonctionnalite;
 import biblio.dev.entity.personne.Adherant;
 import biblio.dev.entity.livre.Exemplaire;
 import biblio.dev.entity.personne.Admin;
+import biblio.dev.entity.description.Statut;
 import jakarta.persistence.*;
 import java.util.Date;
 
@@ -31,6 +32,14 @@ public class Reservation {
     @JoinColumn(name = "idExemplaire")
     private Exemplaire exemplaire;
 
+    @ManyToMany
+    @JoinTable(
+        name = "StatutReservation",
+        joinColumns = @JoinColumn(name = "idReservation"),
+        inverseJoinColumns = @JoinColumn(name = "idStatut")
+    )
+    private java.util.List<Statut> statuts;
+
     // Getters et setters
     public int getIdReservation() { return idReservation; }
     public void setIdReservation(int idReservation) { this.idReservation = idReservation; }
@@ -44,4 +53,6 @@ public class Reservation {
     public void setAdherant(Adherant adherant) { this.adherant = adherant; }
     public Exemplaire getExemplaire() { return exemplaire; }
     public void setExemplaire(Exemplaire exemplaire) { this.exemplaire = exemplaire; }
+    public java.util.List<Statut> getStatuts() { return statuts; }
+    public void setStatuts(java.util.List<Statut> statuts) { this.statuts = statuts; }
 }

@@ -102,3 +102,11 @@ INSERT INTO Exemplaire (idExemplaire, numero, idLivre) VALUES
   (13, 'EX-013', 3),
   (14, 'EX-014', 4),
   (15, 'EX-015', 5);
+
+-- Données de test pour la table Statut
+INSERT INTO Statut (idStatut, nomStatut) VALUES
+  (1, 'En attente'),
+  (2, 'Validée'),
+  (3, 'Refusée'),
+  (4, 'Annulée'),
+  (5, 'Expirée');
