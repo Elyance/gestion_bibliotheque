@@ -7,7 +7,11 @@ import biblio.dev.service.livre.LivreService;
 import biblio.dev.entity.livre.Exemplaire;
 import biblio.dev.entity.livre.Livre;
 import biblio.dev.entity.personne.Adherant;
-import biblio.dev.repository.livre.ExemplaireRepository;
+import biblio.dev.entity.description.Statut;
+import biblio.dev.entity.description.StatutReservation;
+import biblio.dev.entity.description.StatutReservationId;
+import biblio.dev.service.description.StatutService;
+import biblio.dev.service.description.StatutReservationService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +31,10 @@ public class ReservationController {
     private ExemplaireService exemplaireService;
     @Autowired
     private LivreService livreService;
+    @Autowired
+    private StatutService statutService;
+    @Autowired
+    private StatutReservationService statutReservationService;
 
     @GetMapping("/reserver-livre")
     public String showReservationForm(@RequestParam(value = "idLivre", required = false) Integer idLivre, Model model) {
@@ -66,8 +74,18 @@ public class ReservationController {
             reservation.setAdherant(adherant);
             reservation.setExemplaire(exemplaire);
             reservation.setDateReservation(dateReservation);
-            reservation.setDate_(new java.util.Date()); // Ajout de la date du jour pour la colonne date_
+            reservation.setDate_(new java.util.Date());
             reservationService.save(reservation);
+            // Ajout du statut initial "En attente"
+            Statut statut = statutService.findById(1).orElse(null); // 1 = En attente
+            if (statut != null) {
+                StatutReservation statutReservation = new StatutReservation();
+                statutReservation.setId(new StatutReservationId(reservation.getIdReservation(), statut.getIdStatut()));
+                statutReservation.setReservation(reservation);
+                statutReservation.setStatut(statut);
+                statutReservation.setDateStatut(new java.util.Date());
+                statutReservationService.save(statutReservation);
+            }
             model.addAttribute("success", "Réservation enregistrée avec succès.");
         } catch (Exception e) {
             model.addAttribute("error", "Erreur lors de la réservation.");
