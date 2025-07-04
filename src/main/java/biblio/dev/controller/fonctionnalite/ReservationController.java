@@ -7,7 +7,6 @@ import biblio.dev.service.livre.LivreService;
 import biblio.dev.entity.livre.Exemplaire;
 import biblio.dev.entity.livre.Livre;
 import biblio.dev.entity.personne.Adherant;
-import biblio.dev.repository.livre.ExemplaireRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
