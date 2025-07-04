@@ -110,3 +110,58 @@ INSERT INTO Statut (idStatut, nomStatut) VALUES
   (3, 'Refusée'),
   (4, 'Annulée'),
   (5, 'Expirée');
+
+-- Données de test pour la table TypePret
+INSERT INTO TypePret (idTypePret, nomType) VALUES
+  (1, 'A domicile'),
+  (2, 'Sur place');
+
+-- Données de test pour la table Pret
+INSERT INTO Pret (idPret, dateDebut, dateFin, idTypePret, idAdmin, idAdherant, idExemplaire) VALUES
+  (1, '2024-01-15 10:00:00', '2024-02-15 10:00:00', 1, 1, 1, 1),
+  (2, '2024-01-20 14:30:00', '2024-02-20 14:30:00', 2, 2, 2, 3),
+  (3, '2024-02-01 09:15:00', '2024-03-01 09:15:00', 2, 1, 3, 5),
+  (4, '2024-02-10 16:45:00', '2024-03-10 16:45:00', 1, 3, 1, 7),
+  (5, '2024-02-15 11:20:00', '2024-03-15 11:20:00', 2, 2, 2, 9);
+
+-- Prêts en cours (dates futures)
+INSERT INTO Pret (idPret, dateDebut, dateFin, idTypePret, idAdmin, idAdherant, idExemplaire) VALUES
+  (6, '2024-06-01 10:00:00', '2024-08-01 10:00:00', 1, 1, 1, 2),
+  (7, '2024-06-15 14:30:00', '2024-08-15 14:30:00', 2, 2, 2, 4),
+  (8, '2024-07-01 09:15:00', '2024-09-01 09:15:00', 3, 1, 3, 6),
+  (9, '2024-07-10 16:45:00', '2024-09-10 16:45:00', 1, 3, 1, 8),
+  (10, '2024-07-15 11:20:00', '2024-09-15 11:20:00', 2, 2, 2, 10);
+
+-- Prêts expirés (dates passées)
+INSERT INTO Pret (idPret, dateDebut, dateFin, idTypePret, idAdmin, idAdherant, idExemplaire) VALUES
+  (11, '2023-12-01 10:00:00', '2023-12-31 10:00:00', 1, 1, 1, 11),
+  (12, '2023-11-15 14:30:00', '2023-12-15 14:30:00', 2, 2, 2, 12),
+  (13, '2023-10-01 09:15:00', '2023-11-01 09:15:00', 3, 1, 3, 13),
+  (14, '2023-09-10 16:45:00', '2023-10-10 16:45:00', 1, 3, 1, 14),
+  (15, '2023-08-15 11:20:00', '2023-09-15 11:20:00', 2, 2, 2, 15);
+
+-- Quelques demandes de prolongement pour tester
+INSERT INTO DemandeProlongement (idDemande, dateDemande, idPret) VALUES
+  (1, '2024-07-25', 6),
+  (2, '2024-07-20', 7),
+  (3, '2024-08-01', 8),
+  (4, '2024-08-05', 9),
+  (5, '2024-08-10', 10);
+
+-- Quelques prolongements accordés pour tester
+INSERT INTO Prolongement (idProlongement, dateFin, idPret) VALUES
+  (1, '2024-08-31 10:00:00', 6),
+  (2, '2024-09-15 14:30:00', 7),
+  (3, '2024-10-01 09:15:00', 8);
+
+-- Quelques retours pour tester
+INSERT INTO Retour (idRetour, dateRetour, idPret) VALUES
+  (1, '2024-02-10 15:30:00', 1),
+  (2, '2024-02-18 10:15:00', 2),
+  (3, '2024-02-28 14:45:00', 3);
+
+-- Quelques pénalités pour les retours en retard
+INSERT INTO Penalite (idPenalite, nbJourPenalite, date, idPret) VALUES
+  (1, 5, '2024-02-20', 1),
+  (2, 3, '2024-02-23', 2),
+  (3, 7, '2024-03-08', 3);
