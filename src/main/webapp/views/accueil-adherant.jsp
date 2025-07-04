@@ -28,7 +28,7 @@
                                     ISBN : ${livre.ISBN}<br>
                                     Âge limite : ${livre.ageLimite}
                                 </p>
-                                <form action="reserver-livre" method="post">
+                                <form action="reserver-livre" method="get">
                                     <input type="hidden" name="idLivre" value="${livre.idLivre}" />
                                     <button type="submit" class="btn btn-success">Réserver</button>
                                 </form>

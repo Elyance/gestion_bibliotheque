@@ -1,6 +1,7 @@
 package biblio.dev.service.livre;
 
 import biblio.dev.entity.livre.Exemplaire;
+import biblio.dev.entity.livre.Livre;
 import biblio.dev.repository.livre.ExemplaireRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,5 +28,9 @@ public class ExemplaireService {
 
     public void deleteById(Integer id) {
         exemplaireRepository.deleteById(id);
+    }
+
+    public List<Exemplaire> getExemplairesByLivre(Livre livre) {
+        return exemplaireRepository.findByLivre(livre);
     }
 }

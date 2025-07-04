@@ -84,3 +84,21 @@ INSERT INTO LivreCategorie (idLivre, idCategorie) VALUES
   (13, 6), -- L’Étranger (copie) : Classique
   (14, 4), (14, 3), -- Harry Potter (copie) : Fantastique, Aventure
   (15, 4), (15, 3); -- Le Seigneur des Anneaux (copie) : Fantastique, Aventure
+
+-- Données de test pour la table Exemplaire
+INSERT INTO Exemplaire (idExemplaire, numero, idLivre) VALUES
+  (1, 'EX-001', 1),
+  (2, 'EX-002', 1),
+  (3, 'EX-003', 2),
+  (4, 'EX-004', 2),
+  (5, 'EX-005', 3),
+  (6, 'EX-006', 3),
+  (7, 'EX-007', 4),
+  (8, 'EX-008', 4),
+  (9, 'EX-009', 5),
+  (10, 'EX-010', 5),
+  (11, 'EX-011', 1),
+  (12, 'EX-012', 2),
+  (13, 'EX-013', 3),
+  (14, 'EX-014', 4),
+  (15, 'EX-015', 5);
