@@ -1,10 +1,12 @@
 package biblio.dev.service.fonctionnalite;
 
 import biblio.dev.entity.fonctionnalite.Abonnement;
+import biblio.dev.entity.personne.Adherant;
 import biblio.dev.repository.fonctionnalite.AbonnementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,5 +29,9 @@ public class AbonnementService {
 
     public void deleteById(Integer id) {
         abonnementRepository.deleteById(id);
+    }
+
+    public List<Abonnement> getByAdherant(Adherant adherant) {
+        return abonnementRepository.findByAdherant(adherant);
     }
 }

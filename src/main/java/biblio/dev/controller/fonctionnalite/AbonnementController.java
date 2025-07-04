@@ -1,4 +1,4 @@
-package biblio.dev.controller.personne;
+package biblio.dev.controller.fonctionnalite;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,13 +13,18 @@ import org.springframework.ui.Model;
 import biblio.dev.entity.personne.Adherant;
 import biblio.dev.service.fonctionnalite.AbonnementService;
 
+import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+
+import biblio.dev.service.personne.AdherantService;
 
 @Controller
 public class AbonnementController {
     @Autowired
     private AbonnementService abonnementService;
+
+    @Autowired
+    private AdherantService adherantService;
 
     @GetMapping("/abonnement-adherent")
     public String formulaireAbonnementAdherent(Model model) {
@@ -30,8 +35,10 @@ public class AbonnementController {
     public String doAbonnement(HttpServletRequest request,Model model) {
         try {
             SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-            Date dateDebut = sdf.parse(request.getParameter("dateDebut"));
-            Date dateFin = sdf.parse(request.getParameter("dateFin"));
+            java.util.Date utilDateDebut = sdf.parse(request.getParameter("dateDebut"));
+            java.util.Date utilDateFin = sdf.parse(request.getParameter("dateFin"));
+            java.sql.Date dateDebut = new java.sql.Date(utilDateDebut.getTime());
+            java.sql.Date dateFin = new java.sql.Date(utilDateFin.getTime());
 
             if (dateDebut.after(dateFin)) {
                 model.addAttribute("message", "La date de début doit être antérieure à la date de fin.");
@@ -44,7 +51,7 @@ public class AbonnementController {
             abonnement.setDateFin(dateFin);
             abonnement.setAdherant((Adherant) request.getSession().getAttribute("adherantConnecte"));
 
-            
+
 
             abonnementService.save(abonnement);
             
@@ -56,4 +63,5 @@ public class AbonnementController {
         }
         return "abonnement-adherant";
     }
+
 }
