@@ -28,4 +28,8 @@ public class ReservationService {
     public void deleteById(int id) {
         reservationRepository.deleteById(id);
     }
+
+    public List<Reservation> findNonValide() {
+        return reservationRepository.findByAdminIsNull();
+    }
 }
