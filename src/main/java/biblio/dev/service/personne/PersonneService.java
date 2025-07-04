@@ -32,4 +32,9 @@ public class PersonneService {
     public Personne login(String mail, String password) {
         return personneRepository.findByMailAndPassword(mail, password);
     }
+
+    public int getAgeById(int id) {
+        return personneRepository.getAgeById(id);
+    }
+
 }

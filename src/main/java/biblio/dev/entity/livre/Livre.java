@@ -3,6 +3,7 @@ package biblio.dev.entity.livre;
 import java.util.ArrayList;
 import java.util.List;
 
+import biblio.dev.entity.personne.TypeAdherant;
 import jakarta.persistence.*;
 
 @Entity
@@ -24,6 +25,12 @@ public class Livre {
                inverseJoinColumns = @JoinColumn(name = "idCategorie"))
     private List<Categorie> categories = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name = "TypeAdherant_Livre",
+               joinColumns = @JoinColumn(name = "idTypeAdherant"),
+               inverseJoinColumns = @JoinColumn(name = "idLivre"))
+    private List<TypeAdherant> typeAdherants= new ArrayList<>();
+
     // Getters et setters
     public int getIdLivre() { return idLivre; }
     public void setIdLivre(int idLivre) { this.idLivre = idLivre; }
@@ -37,4 +44,16 @@ public class Livre {
     public void setAuteur(String Auteur) { this.Auteur = Auteur; }
     public int getAgeLimite() { return ageLimite; }
     public void setAgeLimite(int ageLimite) { this.ageLimite = ageLimite; }
+    
+    // Getter pour categories avec initialisation sécurisée
+    public List<Categorie> getCategories() {
+        if (categories == null) {
+            categories = new ArrayList<>();
+        }
+        return categories;
+    }
+    
+    public void setCategories(List<Categorie> categories) {
+        this.categories = categories;
+    }
 }

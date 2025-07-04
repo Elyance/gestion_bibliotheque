@@ -110,3 +110,7 @@ INSERT INTO Statut (idStatut, nomStatut) VALUES
   (3, 'Refusée'),
   (4, 'Annulée'),
   (5, 'Expirée');
+
+  INSERT INTO TypePret (idTypePret, nomType) VALUES
+(1, 'Sur place'),
+(2, 'À domicile');
