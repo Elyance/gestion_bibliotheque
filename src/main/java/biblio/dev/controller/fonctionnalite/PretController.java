@@ -94,6 +94,14 @@ public class PretController {
         return "accueil-admin";
     }
 
+    @GetMapping("/list-prets")
+    public String getListePret(Model model) {
+        List<Pret> prets = pretService.findAll();
+
+        model.addAttribute("prets", prets);
+        return "list-pret";
+    }
+
 
     @PostMapping("/ajouterPret")
     public String ajouterPret(HttpServletRequest request, @SessionAttribute("adminConnecte") Admin admin, Model model) {
