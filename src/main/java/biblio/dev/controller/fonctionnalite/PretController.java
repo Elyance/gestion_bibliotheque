@@ -8,27 +8,16 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
 
-import biblio.dev.entity.livre.Exemplaire;
-import biblio.dev.entity.livre.Livre;
-import biblio.dev.entity.personne.Adherant;
-import biblio.dev.entity.personne.Admin;
-import biblio.dev.entity.fonctionnalite.Abonnement;
-import biblio.dev.entity.fonctionnalite.Pret;
-import biblio.dev.entity.fonctionnalite.TypePret;
-import biblio.dev.service.livre.LivreService;
+import biblio.dev.entity.livre.*;
+import biblio.dev.entity.personne.*;
+import biblio.dev.entity.fonctionnalite.*;
+import biblio.dev.service.livre.*;
 import biblio.dev.service.personne.*;
 import biblio.dev.service.regle.*;
 import jakarta.servlet.http.HttpServletRequest;
-import biblio.dev.service.fonctionnalite.PretService;
-import biblio.dev.service.fonctionnalite.TypePretService;
-
-
-import biblio.dev.service.livre.ExemplaireService;
+import biblio.dev.service.fonctionnalite.*;
 
 import java.sql.Date;
 import java.sql.Timestamp; // Ajoute bien cette importation
@@ -59,6 +48,9 @@ public class PretController {
 
     @Autowired 
     private PersonneService personneService;
+
+    @Autowired
+    private PenaliteService penaliteService;
 
 
     @GetMapping("/preter-livre")
@@ -195,6 +187,22 @@ public class PretController {
                model.addAttribute("exemplaires", exemplaireService.getExemplairesByLivre(livre));
                return "form-pret";
            }
+
+           if (!penaliteService.findPenaliteActiveParPeriode(
+                    adherant,
+                    Date.valueOf(dateDebut.toLocalDate()),
+                    Date.valueOf(dateFin.toLocalDate())
+                ).isEmpty()) {
+
+                System.out.println("⛔ Adhérant pénalisé durant la période de prêt !");
+                model.addAttribute("erreurInsertion", "Cet adhérant est pénalisé pendant la période demandée.");
+                model.addAttribute("adherants", adherantService.findAll());
+                model.addAttribute("typesPret", typePretService.findAll());
+                model.addAttribute("livre", livre);
+                model.addAttribute("exemplaires", exemplaireService.getExemplairesByLivre(livre));
+                return "form-pret";
+            }
+
 
            // ✅ Crée et enregistre le prêt
            Pret pret = new Pret();
