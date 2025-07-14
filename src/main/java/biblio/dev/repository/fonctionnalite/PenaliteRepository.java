@@ -20,7 +20,7 @@ public interface PenaliteRepository extends JpaRepository<Penalite, Integer> {
         @Param("dateFin") Date dateFin
     );
 
-    
-
-
+    // Récupère la dernière pénalité pour un adhérent
+    @Query("SELECT p FROM Penalite p WHERE p.pret.adherant = :adherant ORDER BY p.date DESC LIMIT 1")
+    Penalite getDernierePenalite(@Param("adherant") Adherant adherant);
 }
