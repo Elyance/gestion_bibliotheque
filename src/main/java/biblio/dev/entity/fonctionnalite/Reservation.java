@@ -15,7 +15,7 @@ public class Reservation {
     private int idReservation;
 
     @Temporal(TemporalType.DATE)
-    private Date date_;
+    private Date date;
 
     @Temporal(TemporalType.DATE)
     private Date dateReservation;
@@ -43,8 +43,8 @@ public class Reservation {
     // Getters et setters
     public int getIdReservation() { return idReservation; }
     public void setIdReservation(int idReservation) { this.idReservation = idReservation; }
-    public Date getDate_() { return date_; }
-    public void setDate_(Date date_) { this.date_ = date_; }
+    public Date getDate() { return date; }
+    public void setDate(Date date) { this.date = date; }
     public Date getDateReservation() { return dateReservation; }
     public void setDateReservation(Date dateReservation) { this.dateReservation = dateReservation; }
     public Admin getAdmin() { return admin; }

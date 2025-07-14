@@ -33,4 +33,8 @@ public class ExemplaireService {
     public List<Exemplaire> getExemplairesByLivre(Livre livre) {
         return exemplaireRepository.findByLivre(livre);
     }
+
+    public Optional<Exemplaire> getByNumero(String numero) {
+        return exemplaireRepository.findByNumero(numero);
+    }
 }

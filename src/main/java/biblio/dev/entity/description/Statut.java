@@ -2,7 +2,6 @@ package biblio.dev.entity.description;
 
 import biblio.dev.entity.fonctionnalite.Reservation;
 import jakarta.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table(name = "Statut")

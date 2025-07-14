@@ -2,6 +2,10 @@ package biblio.dev.entity.personne;
 
 import jakarta.persistence.*;
 
+import biblio.dev.entity.livre.*;
+
+import java.util.*;
+
 @Entity
 @Table(name = "TypeAdherant")
 public class TypeAdherant {
@@ -10,6 +14,9 @@ public class TypeAdherant {
 
     @Column(nullable = false)
     private String nomTypeAdherant;
+
+    @OneToMany(mappedBy = "typeAdherant")
+    private List<TypeAdherantLivre> typeAdherantLivres = new ArrayList<>();
 
     // Getters et setters
     public Integer getIdTypeAdherant() { return idTypeAdherant; }

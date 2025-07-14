@@ -1,6 +1,8 @@
 package biblio.dev.service.livre;
 
 import biblio.dev.entity.livre.Livre;
+import biblio.dev.entity.personne.Adherant;
+import biblio.dev.entity.personne.TypeAdherant;
 import biblio.dev.repository.livre.LivreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,7 @@ public class LivreService {
     private LivreRepository livreRepository;
 
     public List<Livre> findAll() {
-        return livreRepository.findAll();
+        return livreRepository.findAllWithCategories();
     }
 
     public Optional<Livre> findById(Integer id) {
@@ -27,5 +29,9 @@ public class LivreService {
 
     public void deleteById(Integer id) {
         livreRepository.deleteById(id);
+    }
+
+    public boolean isAutorised(Livre livre,TypeAdherant typeAdherant) {
+        return livreRepository.isLivreAutorisePourTypeAdherant(livre.getIdLivre(),typeAdherant.getIdTypeAdherant()) >= 0;
     }
 }

@@ -24,6 +24,9 @@ public class Livre {
                inverseJoinColumns = @JoinColumn(name = "idCategorie"))
     private List<Categorie> categories = new ArrayList<>();
 
+    @OneToMany(mappedBy = "livre")
+    private List<TypeAdherantLivre> typeAdherantLivres = new ArrayList<>();
+
     // Getters et setters
     public int getIdLivre() { return idLivre; }
     public void setIdLivre(int idLivre) { this.idLivre = idLivre; }
@@ -37,4 +40,16 @@ public class Livre {
     public void setAuteur(String Auteur) { this.Auteur = Auteur; }
     public int getAgeLimite() { return ageLimite; }
     public void setAgeLimite(int ageLimite) { this.ageLimite = ageLimite; }
+    
+    // Getter pour categories avec initialisation sécurisée
+    public List<Categorie> getCategories() {
+        if (categories == null) {
+            categories = new ArrayList<>();
+        }
+        return categories;
+    }
+    
+    public void setCategories(List<Categorie> categories) {
+        this.categories = categories;
+    }
 }
