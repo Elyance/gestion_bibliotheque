@@ -12,4 +12,9 @@ public interface RegleDureeRepository extends JpaRepository<RegleDuree, Integer>
 
     @Query("SELECT r FROM RegleDuree r WHERE r.typeAdherant = :typeAdherant ORDER BY r.date DESC")
     List<RegleDuree> findByTypeOrderByDateDesc(@Param("typeAdherant") TypeAdherant typeAdherant);
+
+    // Nouvelle requête : règle la plus récente à une date donnée
+    @Query("SELECT r FROM RegleDuree r WHERE r.typeAdherant = :typeAdherant AND r.date <= :date ORDER BY r.date DESC")
+    RegleDuree findTopByTypeAdherantAndDateBeforeOrderByDateDesc(@Param("typeAdherant") TypeAdherant typeAdherant,
+                                                                @Param("date") java.sql.Date date);
 }

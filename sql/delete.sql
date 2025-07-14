@@ -1,10 +1,8 @@
--- 🔐 Désactiver les contraintes pour éviter les erreurs de FK
+-- Désactiver temporairement les contraintes de clés étrangères
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Supprimer les données des tables dépendantes en dernier
+-- Suppression des données
 DELETE FROM StatutReservation;
-DELETE FROM TypeAdherant_Livre;
-DELETE FROM LivreCategorie;
 DELETE FROM Penalite;
 DELETE FROM Retour;
 DELETE FROM Reservation;
@@ -16,22 +14,38 @@ DELETE FROM Inscription;
 DELETE FROM Adherant;
 DELETE FROM RegleNbLivre;
 DELETE FROM RegleDuree;
-DELETE FROM Statut;
-DELETE FROM TypePret;
+DELETE FROM TypeAdherant_Livre;
+DELETE FROM LivreCategorie;
 DELETE FROM Exemplaire;
 DELETE FROM Categorie;
 DELETE FROM Livre;
 DELETE FROM Admin;
+DELETE FROM TypePret;
+DELETE FROM Statut;
 DELETE FROM Personne;
 DELETE FROM TypeAdherant;
 
--- ✅ Réactiver les contraintes
-SET FOREIGN_KEY_CHECKS = 1;
-
-
-ALTER TABLE Livre AUTO_INCREMENT = 1;
-ALTER TABLE Personne AUTO_INCREMENT = 1;
-ALTER TABLE Adherant AUTO_INCREMENT = 1;
+-- Réinitialisation des auto-incréments
+ALTER TABLE StatutReservation AUTO_INCREMENT = 1;
+ALTER TABLE Penalite AUTO_INCREMENT = 1;
 ALTER TABLE Retour AUTO_INCREMENT = 1;
+ALTER TABLE Reservation AUTO_INCREMENT = 1;
+ALTER TABLE DemandeProlongement AUTO_INCREMENT = 1;
+ALTER TABLE Prolongement AUTO_INCREMENT = 1;
+ALTER TABLE Pret AUTO_INCREMENT = 1;
+ALTER TABLE Abonnement AUTO_INCREMENT = 1;
+ALTER TABLE Inscription AUTO_INCREMENT = 1;
+ALTER TABLE Adherant AUTO_INCREMENT = 1;
+ALTER TABLE RegleNbLivre AUTO_INCREMENT = 1;
+ALTER TABLE RegleDuree AUTO_INCREMENT = 1;
+ALTER TABLE Exemplaire AUTO_INCREMENT = 1;
+ALTER TABLE Categorie AUTO_INCREMENT = 1;
+ALTER TABLE Livre AUTO_INCREMENT = 1;
+ALTER TABLE Admin AUTO_INCREMENT = 1;
+ALTER TABLE TypePret AUTO_INCREMENT = 1;
+ALTER TABLE Statut AUTO_INCREMENT = 1;
+ALTER TABLE Personne AUTO_INCREMENT = 1;
+ALTER TABLE TypeAdherant AUTO_INCREMENT = 1;
 
--- etc. pour toutes les tables avec clé primaire auto-incrémentée
+-- Réactiver les contraintes de clés étrangères
+SET FOREIGN_KEY_CHECKS = 1;

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.sql.Date;
 
 @Service
 public class RegleDureeService {
@@ -20,6 +21,12 @@ public class RegleDureeService {
             return regles.get(0).getDuree(); // la plus récente
         }
         return 0; // valeur par défaut si aucune règle
+    }
+
+    // Nouvelle méthode : durée à la date de début du prêt
+    public double getDureePourTypeAdherantAlaDate(TypeAdherant typeAdherant, Date dateDebut) {
+        RegleDuree regle = regleDureeRepository.findTopByTypeAdherantAndDateBeforeOrderByDateDesc(typeAdherant, dateDebut);
+        return (regle != null) ? regle.getDuree() : 0.0;
     }
 
     // Pour gérer d'autres cas si besoin (ex: ajout, update, liste)

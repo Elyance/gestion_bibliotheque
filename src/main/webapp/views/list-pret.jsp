@@ -18,10 +18,12 @@
                 </h1>
                 
                 <!-- Vérifier s'il y a des prêts -->
+                <!-- Prêts en cours -->
+                <h3 class="mt-4">Prêts en cours</h3>
                 <c:choose>
-                    <c:when test="${empty prets}">
+                    <c:when test="${empty pretsNonRetournes}">
                         <div class="alert alert-info" role="alert">
-                            <i class="bi bi-info-circle"></i> Aucun prêt trouvé.
+                            <i class="bi bi-info-circle"></i> Aucun prêt en cours.
                         </div>
                     </c:when>
                     <c:otherwise>
@@ -40,7 +42,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="pret" items="${prets}">
+                                    <c:forEach var="pret" items="${pretsNonRetournes}">
                                         <tr>
                                             <td>${pret.idPret}</td>
                                             <td>
@@ -69,17 +71,10 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                    <!-- Bouton Prolonger -->
-                                                    <a href="${pageContext.request.contextPath}/prolonger/${pret.idPret}" 
-                                                       class="btn btn-warning btn-sm" 
-                                                       title="Prolonger le prêt">
+                                                    <a href="${pageContext.request.contextPath}/prolonger/${pret.idPret}" class="btn btn-warning btn-sm" title="Prolonger le prêt">
                                                         <i class="bi bi-calendar-plus"></i> Prolonger
                                                     </a>
-                                                    
-                                                    <!-- Bouton Retourner -->
-                                                    <a href="${pageContext.request.contextPath}/retourner/${pret.idPret}" 
-                                                       class="btn btn-success btn-sm" 
-                                                       title="Retourner le livre">
+                                                    <a href="${pageContext.request.contextPath}/retourner/${pret.idPret}" class="btn btn-success btn-sm" title="Retourner le livre">
                                                         <i class="bi bi-arrow-return-left"></i> Retourner
                                                     </a>
                                                 </div>
@@ -89,7 +84,68 @@
                                 </tbody>
                             </table>
                         </div>
-                        
+                    </c:otherwise>
+                </c:choose>
+
+                <!-- Prêts retournés -->
+                <h3 class="mt-5">Prêts retournés</h3>
+                <c:choose>
+                    <c:when test="${empty pretsRetournes}">
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle"></i> Aucun prêt retourné.
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID Prêt</th>
+                                        <th>Adhérent</th>
+                                        <th>Livre</th>
+                                        <th>Date Début</th>
+                                        <th>Date Fin</th>
+                                        <th>Date Retour</th>
+                                        <th>Type Prêt</th>
+                                        <th>Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="pret" items="${pretsRetournes}">
+                                        <tr>
+                                            <td>${pret.idPret}</td>
+                                            <td>
+                                                <strong>${pret.adherant.personne.nom}</strong>
+                                                <br>
+                                                <small class="text-muted">${pret.adherant.personne.mail}</small>
+                                            </td>
+                                            <td>
+                                                <strong>${pret.exemplaire.livre.titre}</strong>
+                                                <br>
+                                                <small class="text-muted">
+                                                    ISBN: ${pret.exemplaire.livre.ISBN}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <fmt:formatDate value="${pret.dateDebut}" pattern="dd/MM/yyyy HH:mm"/>
+                                            </td>
+                                            <td>
+                                                <fmt:formatDate value="${pret.dateFin}" pattern="dd/MM/yyyy HH:mm"/>
+                                            </td>
+                                            <td>
+                                                <fmt:formatDate value="${pret.retour.dateRetour}" pattern="dd/MM/yyyy HH:mm"/>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">${pret.typePret.nomType}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">Retourné</span>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
                     </c:otherwise>
                 </c:choose>
                 

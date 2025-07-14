@@ -2,7 +2,7 @@ package biblio.dev.entity.personne;
 
 import jakarta.persistence.*;
 
-import biblio.dev.entity.livre.Livre;
+import biblio.dev.entity.livre.*;
 
 import java.util.*;
 
@@ -15,11 +15,8 @@ public class TypeAdherant {
     @Column(nullable = false)
     private String nomTypeAdherant;
 
-    @ManyToMany
-    @JoinTable(name = "TypeAdherant_Livre",
-               joinColumns = @JoinColumn(name = "idLivre"),
-               inverseJoinColumns = @JoinColumn(name = "idTypeAdherant"))
-    List<Livre> livres= new ArrayList<>();
+    @OneToMany(mappedBy = "typeAdherant")
+    private List<TypeAdherantLivre> typeAdherantLivres = new ArrayList<>();
 
     // Getters et setters
     public Integer getIdTypeAdherant() { return idTypeAdherant; }

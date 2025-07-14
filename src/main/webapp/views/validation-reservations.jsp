@@ -51,7 +51,7 @@
                         <td>${res.adherant.idAdherant}</td>
                         <td>${res.exemplaire.numero}</td>
                         <td>${res.dateReservation}</td>
-                        <td>${res.date_}</td>
+                        <td>${res.date}</td>
                         <td>
                             <div class="btn-container">
                                 <form action="valider-reservation" method="post" style="display: inline;">

@@ -37,6 +37,18 @@ public class Pret {
     @JoinColumn(name = "idExemplaire", nullable = false)
     private Exemplaire exemplaire;
 
+    // Ajout de la relation avec Retour
+    @OneToOne(mappedBy = "pret")
+    private Retour retour;
+
+    public Retour getRetour() {
+        return retour;
+    }
+
+    public void setRetour(Retour retour) {
+        this.retour = retour;
+    }
+
     // Getters et setters
     public int getIdPret() {
         return idPret;

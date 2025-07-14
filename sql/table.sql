@@ -63,7 +63,7 @@ CREATE TABLE Statut(
 CREATE TABLE RegleDuree(
    idRegleDuree INT,
    duree DECIMAL(5,2) NOT NULL,
-   date_ DATE NOT NULL,
+   date DATE NOT NULL,
    idTypeAdherant VARCHAR(55) NOT NULL,
    PRIMARY KEY(idRegleDuree),
    FOREIGN KEY(idTypeAdherant) REFERENCES TypeAdherant(idTypeAdherant)
@@ -72,7 +72,7 @@ CREATE TABLE RegleDuree(
 CREATE TABLE RegleNbLivre(
    idRegleNbLivre INT,
    nbLivre INT NOT NULL,
-   date_ DATE NOT NULL,
+   date DATE NOT NULL,
    idTypeAdherant VARCHAR(55) NOT NULL,
    PRIMARY KEY(idRegleNbLivre),
    FOREIGN KEY(idTypeAdherant) REFERENCES TypeAdherant(idTypeAdherant)
@@ -138,7 +138,7 @@ CREATE TABLE DemandeProlongement(
 
 CREATE TABLE Reservation(
    idReservation INT,
-   date_ DATE NOT NULL,
+   date DATE NOT NULL,
    dateReservation DATE NOT NULL,
    idAdmin INT,
    idAdherant INT NOT NULL,
@@ -178,6 +178,7 @@ CREATE TABLE LivreCategorie(
 CREATE TABLE TypeAdherant_Livre(
    idTypeAdherant VARCHAR(55),
    idLivre INT,
+   date DATE NOT NULL,
    PRIMARY KEY(idTypeAdherant, idLivre),
    FOREIGN KEY(idTypeAdherant) REFERENCES TypeAdherant(idTypeAdherant),
    FOREIGN KEY(idLivre) REFERENCES Livre(idLivre)

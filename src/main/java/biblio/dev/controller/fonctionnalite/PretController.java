@@ -27,6 +27,9 @@ import java.sql.Timestamp; // Ajoute bien cette importation
 public class PretController {
     @Autowired
     private LivreService livreService;
+
+    @Autowired
+    private TypeAdherantLivreService typeAdherantLivreService;
     
     @Autowired
     private AdherantService adherantService;
@@ -96,9 +99,11 @@ public class PretController {
 
     @GetMapping("/list-prets")
     public String getListePret(Model model) {
-        List<Pret> prets = pretService.findAll();
+        List<Pret> pretsNonRetournes = pretService.findPretsNonRetournes();
+        List<Pret> pretsRetournes = pretService.findPretsRetournes();
 
-        model.addAttribute("prets", prets);
+        model.addAttribute("pretsNonRetournes", pretsNonRetournes);
+        model.addAttribute("pretsRetournes", pretsRetournes);
         return "list-pret";
     }
 
@@ -106,12 +111,13 @@ public class PretController {
     @PostMapping("/ajouterPret")
     public String ajouterPret(HttpServletRequest request, @SessionAttribute("adminConnecte") Admin admin, Model model) {
        try {
+        // Récupérer les paramètres du formulaire
            int idAdherant = Integer.parseInt(request.getParameter("idAdherant"));
            int idTypePret = Integer.parseInt(request.getParameter("idTypePret"));
            int idLivre = Integer.parseInt(request.getParameter("idLivre"));
            String dateDebutStr = request.getParameter("dateDebut");
            String numeroExemplaire = request.getParameter("numeroExemplaire");
-
+        // Vérifier que les paramètres ne sont pas vides
            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
            LocalDateTime dateDebut = LocalDateTime.parse(dateDebutStr, formatter);
 
@@ -124,10 +130,11 @@ public class PretController {
            Livre livre = livreService.findById(idLivre)
                .orElseThrow(() -> new RuntimeException("Livre non existant"));
 
-           // ❌ Vérifie si le livre est autorisé pour ce type d’adhérant
-           if (!livreService.isAutorised(livre, adherant.getTypeAdherant())) {
-               System.out.println("⛔ Livre non autorisé pour le type d'adhérant : " + adherant.getTypeAdherant().getNomTypeAdherant());
-               model.addAttribute("erreurInsertion", "Ce livre n'est pas autorisé pour cet adhérant.");
+           // ❌ Vérifie si le livre est autorisé pour ce type d’adhérant à la date du prêt
+           Date dateDemande = Date.valueOf(dateDebut.toLocalDate());
+           if (!typeAdherantLivreService.isLivreAutorisePourAdherant(adherant, livre, dateDemande)) {
+               System.out.println("⛔ Livre non autorisé pour le type d'adhérant (table TypeAdherant_Livre, date) : " + adherant.getTypeAdherant().getNomTypeAdherant());
+               model.addAttribute("erreurInsertion", "Ce livre n'est pas autorisé pour cet adhérant à la date demandée.");
                model.addAttribute("adherants", adherantService.findAll());
                model.addAttribute("typesPret", typePretService.findAll());
                model.addAttribute("livre", livre);
@@ -135,6 +142,7 @@ public class PretController {
                return "form-pret";
            }
 
+            // 🔍 Vérifie l’âge de l’adhérant par rapport à l’âge limite du livre
            int ageAdherant = personneService.getAgeById(adherant.getIdAdherant());
            
            if (ageAdherant < livre.getAgeLimite()) {
@@ -150,8 +158,11 @@ public class PretController {
                 return "form-pret";
             }
 
+
+            Date dateDebutSql = Date.valueOf(dateDebut.toLocalDate());
+
            // 📆 Calcule la date de fin selon la règle de durée
-           double dureeJour = regleDureeService.getDureePourTypeAdherant(adherant.getTypeAdherant());
+           double dureeJour = regleDureeService.getDureePourTypeAdherantAlaDate(adherant.getTypeAdherant(),dateDebutSql);
            LocalDateTime dateFin = dateDebut.plusDays((long) dureeJour);
 
            System.out.println("Durée autorisée : " + dureeJour + " jours");
@@ -159,7 +170,7 @@ public class PretController {
            System.out.println("Date fin calculée : " + dateFin);
 
            // 🔒 Vérifie le quota de prêt
-           int limite = regleNbLivreService.getLimitePourTypeAdherant(adherant.getTypeAdherant());
+           int limite = regleNbLivreService.getLimitePourTypeAdherantAlaDate(adherant.getTypeAdherant(),dateDebutSql);
            int nbPretsActifs = pretService.countPretsEnCoursParAdherant(adherant);
 
            System.out.println("=== DEBUG PRET ===");
@@ -196,12 +207,8 @@ public class PretController {
                return "form-pret";
            }
 
-           if (!penaliteService.findPenaliteActiveParPeriode(
-                    adherant,
-                    Date.valueOf(dateDebut.toLocalDate()),
-                    Date.valueOf(dateFin.toLocalDate())
-                ).isEmpty()) {
-
+            // 🔍 Vérifie si l’adhérant est pénalisé durant la période de prêt
+           if (penaliteService.isPenaliseAlaDate(adherant,dateDebutSql)) {
                 System.out.println("⛔ Adhérant pénalisé durant la période de prêt !");
                 model.addAttribute("erreurInsertion", "Cet adhérant est pénalisé pendant la période demandée.");
                 model.addAttribute("adherants", adherantService.findAll());

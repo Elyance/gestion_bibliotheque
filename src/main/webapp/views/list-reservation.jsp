@@ -148,7 +148,7 @@
                                             </c:if>
                                         </td>
                                         <td>
-                                            <fmt:formatDate value="${res.date_}" pattern="dd/MM/yyyy"/>
+                                            <fmt:formatDate value="${res.date}" pattern="dd/MM/yyyy"/>
                                         </td>
                                         <td>
                                             <fmt:formatDate value="${res.dateReservation}" pattern="dd/MM/yyyy"/>

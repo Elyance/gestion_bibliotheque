@@ -1,3 +1,4 @@
+
 package biblio.dev.service.fonctionnalite;
 
 import biblio.dev.entity.fonctionnalite.Pret;
@@ -43,6 +44,20 @@ public class PretService {
 
     public int countPretsEnCoursParAdherant(Adherant adherant) {
         return pretRepository.countPretsEnCoursParAdherant(adherant);
+    }
+
+    // Retourne la liste des prêts retournés
+    public List<Pret> findPretsRetournes() {
+        return pretRepository.findAll().stream()
+                .filter(pret -> pret.getRetour() != null)
+                .toList();
+    }
+
+    // Retourne la liste des prêts non retournés
+    public List<Pret> findPretsNonRetournes() {
+        return pretRepository.findAll().stream()
+                .filter(pret -> pret.getRetour() == null)
+                .toList();
     }
 }
 

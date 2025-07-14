@@ -74,7 +74,7 @@ public class ReservationController {
             reservation.setAdherant(adherant);
             reservation.setExemplaire(exemplaire);
             reservation.setDateReservation(dateReservation);
-            reservation.setDate_(new java.util.Date());
+            reservation.setDate(new java.util.Date());
             reservationService.save(reservation);
             // Ajout du statut initial "En attente"
             Statut statut = statutService.findById(1).orElse(null); // 1 = En attente

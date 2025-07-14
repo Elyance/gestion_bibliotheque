@@ -13,7 +13,7 @@ public class RegleDuree {
 
     private double duree;
 
-    @Column(name = "date_")
+    @Column(name = "date")
     private LocalDate date;
 
     @ManyToOne
