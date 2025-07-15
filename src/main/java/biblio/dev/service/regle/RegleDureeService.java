@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.sql.Date;
 
 @Service
 public class RegleDureeService {
@@ -24,7 +23,7 @@ public class RegleDureeService {
     }
 
     // Nouvelle méthode : durée à la date de début du prêt
-    public double getDureePourTypeAdherantAlaDate(TypeAdherant typeAdherant, Date dateDebut) {
+    public double getDureePourTypeAdherantAlaDate(TypeAdherant typeAdherant, java.time.LocalDate dateDebut) {
         RegleDuree regle = regleDureeRepository.findTopByTypeAdherantAndDateBeforeOrderByDateDesc(typeAdherant, dateDebut);
         return (regle != null) ? regle.getDuree() : 0.0;
     }

@@ -28,11 +28,12 @@
         <div class="alert alert-danger text-center">${error}</div>
     </c:if>
     
-    <c:if test="${empty reservations}">
+    <!-- Section réservations non validées -->
+    <h4 class="mt-4">Réservations à valider</h4>
+    <c:if test="${empty reservationsNonValides}">
         <div class="alert alert-info text-center">Aucune réservation à valider.</div>
     </c:if>
-    
-    <c:if test="${not empty reservations}">
+    <c:if test="${not empty reservationsNonValides}">
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
@@ -45,7 +46,7 @@
                 </tr>
             </thead>
             <tbody>
-                <c:forEach var="res" items="${reservations}">
+                <c:forEach var="res" items="${reservationsNonValides}">
                     <tr>
                         <td>${res.idReservation}</td>
                         <td>${res.adherant.idAdherant}</td>
@@ -61,7 +62,6 @@
                                         <i class="bi bi-check-circle"></i> Valider
                                     </button>
                                 </form>
-                                
                                 <form action="refuser-reservation" method="post" style="display: inline;">
                                     <input type="hidden" name="idReservation" value="${res.idReservation}" />
                                     <button type="submit" class="btn btn-danger btn-sm" 
@@ -70,6 +70,101 @@
                                     </button>
                                 </form>
                             </div>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+    </c:if>
+
+    <!-- Section réservations validées -->
+    <h4 class="mt-5">Réservations validées</h4>
+    <c:if test="${empty reservationsValides}">
+        <div class="alert alert-info text-center">Aucune réservation validée.</div>
+    </c:if>
+    <c:if test="${not empty reservationsValides}">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Adhérant</th>
+                    <th>Exemplaire</th>
+                    <th>Date réservation</th>
+                    <th>Date demande</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="res" items="${reservationsValides}">
+                    <tr>
+                        <td>${res.idReservation}</td>
+                        <td>${res.adherant.idAdherant}</td>
+                        <td>${res.exemplaire.numero}</td>
+                        <td>${res.dateReservation}</td>
+                        <td>${res.date}</td>
+                        <td>
+                            <div class="btn-container">
+                                <form action="prendre-livre-reserve" method="get" style="display: inline;">
+                                    <input type="hidden" name="idReservation" value="${res.idReservation}" />
+                                    <button type="submit" class="btn btn-primary btn-sm" 
+                                            onclick="return confirm('Transformer cette réservation en prêt ?')">
+                                        <i class="bi bi-arrow-right-circle"></i> Prêter
+                                    </button>
+                                </form>
+                                <form action="expire-reservation" method="post" style="display: inline;">
+                                    <input type="hidden" name="idReservation" value="${res.idReservation}" />
+                                    <button type="submit" class="btn btn-danger btn-sm" 
+                                            onclick="return confirm('Êtes-vous sûr de vouloir rejeter cette réservation ?')">
+                                        <i class="bi bi-x-circle"></i> Rejeter
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+    </c:if>
+    
+    <!-- Section réservations traitées -->
+    <h4 class="mt-5">Réservations traitées (statut ≠ 3 et admin ≠ null)</h4>
+    <c:if test="${empty reservationsTraitees}">
+        <div class="alert alert-info text-center">Aucune réservation traitée.</div>
+    </c:if>
+    <c:if test="${not empty reservationsTraitees}">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Adhérant</th>
+                    <th>Exemplaire</th>
+                    <th>Date réservation</th>
+                    <th>Date demande</th>
+                    <th>Admin</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="res" items="${reservationsTraitees}">
+                    <tr>
+                        <td>${res.idReservation}</td>
+                        <td>${res.adherant.idAdherant}</td>
+                        <td>${res.exemplaire.numero}</td>
+                        <td>${res.dateReservation}</td>
+                        <td>${res.date}</td>
+                        <td>
+                            <c:if test="${res.admin != null && res.admin.personne != null}">
+                                ${res.admin.personne.nom}
+                            </c:if>
+                            <c:if test="${res.admin == null || res.admin.personne == null}">
+                                <span class="text-muted">-</span>
+                            </c:if>
+                        </td>
+                        <td>
+                            <c:set var="statutActuel" value="${res.getStatut().nomStatut}" />
+                            <c:if test="${statutActuel != null}">
+                                ${res.getStatut().nomStatut}
+                            </c:if>
                         </td>
                     </tr>
                 </c:forEach>

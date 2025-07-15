@@ -72,3 +72,10 @@ INSERT INTO TypeAdherant_Livre (idTypeAdherant, idLivre, date) VALUES
 -- Pour chaque cas, le contrôleur doit :
 -- - Accepter le prêt si la date demandée >= date de la table pour le type/livre
 -- - Refuser sinon
+
+INSERT INTO Statut (idStatut, nomStatut) VALUES
+(1, 'En attente'),
+(2, 'Validé'),
+(3, 'Refusé'),
+(4, 'Prêt'),
+(5, 'Expiré');

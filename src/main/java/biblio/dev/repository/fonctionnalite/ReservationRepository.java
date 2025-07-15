@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
     List<Reservation> findByAdminIsNull();
+    List<Reservation> findByAdminIsNotNull();
 }
