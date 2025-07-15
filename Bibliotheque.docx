@@ -1,0 +1,86 @@
+Résumé des fonctionnalités réalisées - Application Gestion Bibliothèque
+
+---
+
+1. Réserver un livre
+
+- Input :
+  - Adhérant, exemplaire, date de réservation
+- Règles de gestion :
+  - L’exemplaire doit être disponible à la date (ni en prêt actif, ni réservé validé)
+  - L’adhérant doit être autorisé à réserver ce livre (âge, quota, abonnement, pénalité)
+- Scénario nominal :
+  - L’adhérant sélectionne un exemplaire disponible et valide la réservation
+- Scénarios alternatifs :
+  - L’exemplaire n’est pas disponible (erreur affichée)
+  - L’adhérant n’a pas le droit (erreur affichée)
+- Résultat :
+  - Ajout d’une réservation avec statut « validé »
+
+---
+
+2. Emprunter un livre
+
+- Input :
+  - Adhérant, exemplaire, type de prêt, date de début
+- Règles de gestion :
+  - L’exemplaire doit être disponible à la date de début
+  - L’adhérant doit être autorisé (âge, quota, abonnement, pénalité)
+- Scénario nominal :
+  - L’adhérant sélectionne un exemplaire disponible et valide l’emprunt
+- Scénarios alternatifs :
+  - L’exemplaire n’est pas disponible (erreur affichée)
+  - L’adhérant n’a pas le droit (erreur affichée)
+- Résultat :
+  - Ajout d’un prêt avec date de début et de fin
+
+---
+
+3. Transformer une réservation en prêt
+
+- Input :
+  - Réservation validée, type de prêt, date de début
+- Règles de gestion :
+  - Toutes les règles métier du prêt sont vérifiées à la date de début
+  - L’exemplaire doit être disponible à la date
+- Scénario nominal :
+  - L’adhérant transforme sa réservation en prêt, toutes les vérifications passent
+- Scénarios alternatifs :
+  - Règle métier non respectée (erreur affichée)
+  - Exemplaire non disponible (erreur affichée)
+- Résultat :
+  - Ajout d’un prêt, suppression ou mise à jour de la réservation
+
+---
+
+4. Retourner un livre
+
+- Input :
+  - Prêt actif, date de retour
+- Règles de gestion :
+  - Le prêt doit être en cours
+- Scénario nominal :
+  - L’adhérant retourne le livre, la date de retour est enregistrée
+- Scénarios alternatifs :
+  - Prêt déjà retourné (erreur affichée)
+- Résultat :
+  - Mise à jour du prêt avec la date de retour
+
+---
+
+5. Gestion des pénalités
+
+- Input :
+  - Adhérant, date
+- Règles de gestion :
+  - Vérification des retards et infractions
+- Scénario nominal :
+  - L’adhérant n’a pas de pénalité, il peut réserver/emprunter
+- Scénarios alternatifs :
+  - Pénalité active (erreur affichée lors de la réservation/emprunt)
+- Résultat :
+  - Blocage des opérations, affichage du motif
+
+---
+
+Ce document synthétise les principales fonctionnalités et leur robustesse métier dans l’application de gestion de bibliothèque.
