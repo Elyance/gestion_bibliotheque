@@ -43,6 +43,9 @@ public class ReservationValidationController {
     
     @Autowired
     private StatutReservationService statutReservationService; 
+    
+    @Autowired
+    private PretController pretController;
 
 
 
@@ -159,29 +162,19 @@ public class ReservationValidationController {
 
     @PostMapping("/prendre-livre-reserve") 
     public String prendreLivreReserve(@RequestParam("idReservation") int idReservation,
-                                        @RequestParam("typePret") int typePretId,
+                                      @RequestParam("typePret") int typePretId,
                                       @SessionAttribute("adminConnecte") Admin admin,
                                       Model model) {
         Reservation reservation = reservationService.findById(idReservation).orElse(null);
         Optional<TypePret> typePretOpt = typePretService.findById(typePretId);
         if (reservation != null && typePretOpt.isPresent()) {
-            Pret pret = new Pret();
-            pret.setAdherant(reservation.getAdherant());
-            pret.setExemplaire(reservation.getExemplaire());
-            pret.setAdmin(admin);
-            Date dateDebut = new Date();
-            pret.setDateDebut(dateDebut);
-            double dureeJour = regleDureeService.getDureePourTypeAdherantAlaDate(
-                reservation.getAdherant().getTypeAdherant(),
-                dateDebut.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate()
-            );
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(dateDebut);
-            cal.add(Calendar.DAY_OF_MONTH, (int) dureeJour);
-            pret.setDateFin(cal.getTime());
-            pret.setTypePret(typePretOpt.get());
+            Pret pret = pretService.creerPretDepuisReservation(reservation, typePretOpt.get(), admin, model);
+            if (pret == null) {
+                // Une règle métier a échoué, le message d'erreur est déjà dans le modèle
+                refreshReservationsList(model);
+                return "validation-reservations";
+            }
             pretService.save(pret);
-
             Statut statutPret = statutService.findById(4).orElse(null);
             if (statutPret != null) {
                 reservation.setStatut(statutPret);

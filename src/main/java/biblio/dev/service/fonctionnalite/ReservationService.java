@@ -1,6 +1,7 @@
 package biblio.dev.service.fonctionnalite;
 
 import biblio.dev.entity.fonctionnalite.Reservation;
+import biblio.dev.entity.personne.Adherant;
 import biblio.dev.repository.fonctionnalite.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,4 +60,5 @@ public class ReservationService {
         }
         return result;
     }
+
 }

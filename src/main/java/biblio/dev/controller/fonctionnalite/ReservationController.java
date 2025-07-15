@@ -12,6 +12,11 @@ import biblio.dev.entity.description.StatutReservation;
 import biblio.dev.entity.description.StatutReservationId;
 import biblio.dev.service.description.StatutService;
 import biblio.dev.service.description.StatutReservationService;
+import biblio.dev.service.livre.TypeAdherantLivreService;
+import biblio.dev.service.personne.PersonneService;
+import biblio.dev.service.regle.RegleNbLivreService;
+import biblio.dev.service.personne.AdherantService;
+import biblio.dev.service.fonctionnalite.PenaliteService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,6 +40,14 @@ public class ReservationController {
     private StatutService statutService;
     @Autowired
     private StatutReservationService statutReservationService;
+    @Autowired
+    private TypeAdherantLivreService typeAdherantLivreService;
+    @Autowired
+    private PersonneService personneService;
+    @Autowired
+    private AdherantService adherantService;
+    @Autowired
+    private PenaliteService penaliteService;
 
     @GetMapping("/reserver-livre")
     public String showReservationForm(@RequestParam(value = "idLivre", required = false) Integer idLivre, Model model) {
@@ -70,14 +83,45 @@ public class ReservationController {
         }
         try {
             Date dateReservation = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(dateReservationStr);
+            // Vérification livre autorisé
+            Livre livre = exemplaire.getLivre();
+            if (!typeAdherantLivreService.isLivreAutorisePourAdherant(adherant, livre, dateReservation)) {
+                model.addAttribute("error", "Ce livre n'est pas autorisé pour cet adhérant à la date demandée.");
+                model.addAttribute("exemplaires", exemplaires);
+                return "reserver-livre";
+            }
+            // Vérification âge
+            int ageAdherant = personneService.getAgeById(adherant.getIdAdherant());
+            if (ageAdherant < livre.getAgeLimite()) {
+                model.addAttribute("error", "L'âge minimum requis pour ce livre est de " + livre.getAgeLimite() + " ans.");
+                model.addAttribute("exemplaires", exemplaires);
+                return "reserver-livre";
+            }
+            // Vérification abonnement
+            java.sql.Date sqlDateReservation = new java.sql.Date(dateReservation.getTime());
+            if (!adherantService.isAbonnee(sqlDateReservation, sqlDateReservation, adherant)) {
+                model.addAttribute("error", "Cet adhérant n'est pas abonné à la date de réservation.");
+                model.addAttribute("exemplaires", exemplaires);
+                return "reserver-livre";
+            }
+            // Vérification pénalité
+            if (penaliteService.isPenaliseAlaDate(adherant, new Date(dateReservation.getTime()))) {
+                model.addAttribute("error", "Cet adhérant est pénalisé à la date de réservation.");
+                model.addAttribute("exemplaires", exemplaires);
+                return "reserver-livre";
+            }
+            // Création et sauvegarde de la réservation
             Reservation reservation = new Reservation();
             reservation.setAdherant(adherant);
             reservation.setExemplaire(exemplaire);
             reservation.setDateReservation(dateReservation);
             reservation.setDate(new java.util.Date());
-            reservationService.save(reservation);
-            // Ajout du statut initial "En attente"
+            // Initialisation du statut à "En attente"
             Statut statut = statutService.findById(1).orElse(null); // 1 = En attente
+            if (statut != null) {
+                reservation.setStatut(statut);
+            }
+            reservationService.save(reservation);
             if (statut != null) {
                 StatutReservation statutReservation = new StatutReservation();
                 statutReservation.setId(new StatutReservationId(reservation.getIdReservation(), statut.getIdStatut()));
