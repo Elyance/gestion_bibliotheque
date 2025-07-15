@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
 public class ReservationService {
+    
     @Autowired
     private ReservationRepository reservationRepository;
 
@@ -31,5 +33,30 @@ public class ReservationService {
 
     public List<Reservation> findNonValide() {
         return reservationRepository.findByAdminIsNull();
+    }
+
+    // La logique de filtrage par statut doit être faite côté contrôleur
+    public List<Reservation> findValide() {
+        // statut == 2 et admin != null
+        List<Reservation> all = reservationRepository.findByAdminIsNotNull();
+        List<Reservation> result = new ArrayList<>();
+        for (Reservation r : all) {
+            if (r.getStatut() != null && r.getStatut().getIdStatut() == 2) {
+                result.add(r);
+            }
+        }
+        return result;
+    }
+
+    public List<Reservation> findTraitees() {
+        // statut != 2 et admin != null
+        List<Reservation> all = reservationRepository.findByAdminIsNotNull();
+        List<Reservation> result = new ArrayList<>();
+        for (Reservation r : all) {
+            if (r.getStatut() != null && r.getStatut().getIdStatut() != 2) {
+                result.add(r);
+            }
+        }
+        return result;
     }
 }

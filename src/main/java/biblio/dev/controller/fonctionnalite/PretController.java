@@ -162,7 +162,7 @@ public class PretController {
             Date dateDebutSql = Date.valueOf(dateDebut.toLocalDate());
 
            // 📆 Calcule la date de fin selon la règle de durée
-           double dureeJour = regleDureeService.getDureePourTypeAdherantAlaDate(adherant.getTypeAdherant(),dateDebutSql);
+           double dureeJour = regleDureeService.getDureePourTypeAdherantAlaDate(adherant.getTypeAdherant(),dateDebut.toLocalDate());
            LocalDateTime dateFin = dateDebut.plusDays((long) dureeJour);
 
            System.out.println("Durée autorisée : " + dureeJour + " jours");

@@ -40,6 +40,13 @@ public class Reservation {
     )
     private java.util.List<Statut> statuts;
 
+    @ManyToOne
+    @JoinColumn(name = "idStatutActuel")
+    private Statut statut;
+
+    public Statut getStatut() { return statut; }
+    public void setStatut(Statut statut) { this.statut = statut; }
+
     // Getters et setters
     public int getIdReservation() { return idReservation; }
     public void setIdReservation(int idReservation) { this.idReservation = idReservation; }
