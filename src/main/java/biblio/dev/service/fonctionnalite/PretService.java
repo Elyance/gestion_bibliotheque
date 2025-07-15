@@ -13,10 +13,16 @@ import java.util.Optional;
 import biblio.dev.entity.fonctionnalite.TypePret;
 import biblio.dev.entity.personne.Admin;
 import org.springframework.ui.Model;
-import java.sql.Timestamp;
-import java.sql.Date;
+import java.sql.*;
 import java.time.LocalDateTime;
 import biblio.dev.entity.fonctionnalite.Reservation;
+import biblio.dev.service.personne.AdherantService;
+import biblio.dev.service.personne.PersonneService;
+import biblio.dev.service.livre.*;
+import biblio.dev.entity.livre.*;
+import biblio.dev.service.regle.RegleNbLivreService;
+import biblio.dev.service.regle.RegleDureeService;
+
 
 @Service
 public class PretService {
@@ -25,17 +31,23 @@ public class PretService {
     private PretRepository pretRepository;
 
     @Autowired
-    private biblio.dev.service.livre.TypeAdherantLivreService typeAdherantLivreService;
+    private TypeAdherantLivreService typeAdherantLivreService;
     @Autowired
-    private biblio.dev.service.personne.PersonneService personneService;
+    private PersonneService personneService;
     @Autowired
-    private biblio.dev.service.regle.RegleNbLivreService regleNbLivreService;
+    private RegleNbLivreService regleNbLivreService;
     @Autowired
-    private biblio.dev.service.personne.AdherantService adherantService;
+    private AdherantService adherantService;
     @Autowired
-    private biblio.dev.service.regle.RegleDureeService regleDureeService;
+    private RegleDureeService regleDureeService;
     @Autowired
-    private biblio.dev.service.fonctionnalite.PenaliteService penaliteService;
+    private PenaliteService penaliteService;
+
+    @Autowired
+    private LivreService livreService;
+
+    @Autowired
+    private biblio.dev.service.fonctionnalite.ReservationService reservationService;
 
     public List<Pret> findAll() {
         return pretRepository.findAll();
@@ -79,16 +91,37 @@ public class PretService {
                 .toList();
     }
 
+    // Méthode utilitaire pour obtenir les réservations d'un exemplaire
+    private List<Reservation> getReservationsByExemplaire(Exemplaire exemplaire) {
+        List<Reservation> allReservations = reservationService.findAll();
+        List<Reservation> result = new java.util.ArrayList<>();
+        for (Reservation r : allReservations) {
+            if (r.getExemplaire().getIdExemplaire() == exemplaire.getIdExemplaire()) {
+                result.add(r);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Vérifie si un exemplaire est disponible (ni en prêt actif, ni réservé validé) à une date donnée
+     */
+    public boolean isExemplaireDisponible(Exemplaire exemplaire, LocalDateTime dateDebut) {
+        return livreService.isDispo(exemplaire, dateDebut.toLocalDate());
+    }
+
     /**
      * Vérifie toutes les règles métier pour un prêt (livre autorisé, âge, quota, abonnement, pénalité).
      * Retourne null si une règle échoue et ajoute le message d'erreur au modèle, sinon retourne un objet Pret prêt à être enregistré.
      */
-    public Pret verifierEtConstruirePret(Adherant adherant, Exemplaire exemplaire, TypePret typePret, Admin admin, Model model) {
-        biblio.dev.entity.livre.Livre livre = exemplaire.getLivre();
-        java.util.Date dateDebutUtil = new java.util.Date();
-        java.time.LocalDateTime dateDebut = dateDebutUtil.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime();
+    public Pret verifierEtConstruirePret(Adherant adherant, Exemplaire exemplaire, TypePret typePret, Admin admin, Model model, LocalDateTime dateDebut) {
+        Livre livre = exemplaire.getLivre();
         Date dateDemande = Date.valueOf(dateDebut.toLocalDate());
-
+        // Règle 0 : Disponibilité de l'exemplaire
+        if (!isExemplaireDisponible(exemplaire, dateDebut)) {
+            model.addAttribute("error", "Cet exemplaire n'est pas disponible : il est déjà réservé ou en prêt.");
+            return null;
+        }
         // 1. Livre autorisé ?
         if (!typeAdherantLivreService.isLivreAutorisePourAdherant(adherant, livre, dateDemande)) {
             model.addAttribute("error", "Ce livre n'est pas autorisé pour cet adhérant à la date demandée.");
@@ -108,9 +141,9 @@ public class PretService {
             return null;
         }
         // 4. Abonnement
-        Date sqlDateDebut = java.sql.Date.valueOf(dateDebut.toLocalDate());
+        Date sqlDateDebut = Date.valueOf(dateDebut.toLocalDate());
         double dureeJour = regleDureeService.getDureePourTypeAdherantAlaDate(adherant.getTypeAdherant(), dateDebut.toLocalDate());
-        LocalDateTime dateFin = dateDebut.plusDays((long) dureeJour);
+        java.time.LocalDateTime dateFin = dateDebut.plusDays((long) dureeJour);
         Date sqlDateFin = Date.valueOf(dateFin.toLocalDate());
         if (!adherantService.isAbonnee(sqlDateDebut, sqlDateFin, adherant)) {
             model.addAttribute("error", "Cet adhérant n'est pas abonné durant toute la période de prêt.");
@@ -133,7 +166,9 @@ public class PretService {
     }
 
     public Pret creerPretDepuisReservation(Reservation reservation, TypePret typePret, Admin admin, Model model) {
-        return verifierEtConstruirePret(reservation.getAdherant(), reservation.getExemplaire(), typePret, admin, model);
+        // Utilise la date courante pour la transformation de réservation en prêt
+        LocalDateTime dateDebut = LocalDateTime.now();
+        return verifierEtConstruirePret(reservation.getAdherant(), reservation.getExemplaire(), typePret, admin, model, dateDebut);
     }
 }
 

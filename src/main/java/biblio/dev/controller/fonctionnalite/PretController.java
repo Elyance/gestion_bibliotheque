@@ -17,6 +17,7 @@ import biblio.dev.entity.personne.Adherant;
 import biblio.dev.entity.personne.Admin;
 import biblio.dev.entity.fonctionnalite.Pret;
 import biblio.dev.entity.fonctionnalite.TypePret;
+import biblio.dev.entity.fonctionnalite.Reservation;
 import biblio.dev.service.livre.LivreService;
 import biblio.dev.service.livre.ExemplaireService;
 import biblio.dev.service.personne.AdherantService;
@@ -30,6 +31,8 @@ public class PretController {
     @Autowired private TypePretService typePretService;
     @Autowired private ExemplaireService exemplaireService;
     @Autowired private PretService pretService;
+    @Autowired private biblio.dev.service.fonctionnalite.ReservationService reservationService;
+    @Autowired private biblio.dev.service.fonctionnalite.RetourService retourService;
 
     // Affiche le formulaire de prêt
     @GetMapping("/preter-livre")
@@ -76,7 +79,23 @@ public class PretController {
             TypePret typePret = typePretService.findById(idTypePret).orElseThrow(() -> new RuntimeException("Type de prêt introuvable"));
             Exemplaire exemplaire = exemplaireService.getByNumero(numeroExemplaire).orElseThrow(() -> new RuntimeException("Exemplaire introuvable"));
             Livre livre = livreService.findById(idLivre).orElseThrow(() -> new RuntimeException("Livre non existant"));
-            Pret pret = pretService.verifierEtConstruirePret(adherant, exemplaire, typePret, admin, model);
+            Pret pret = pretService.verifierEtConstruirePret(adherant, exemplaire, typePret, admin, model, dateDebut);
+            
+            // Vérification disponibilité exemplaire
+            // 1. Vérifier qu'il n'existe pas de prêt actif pour cet exemplaire
+            List<Pret> pretsExemplaire = pretService.findByExemplaire(exemplaire);
+            boolean exemplaireEnPret = pretsExemplaire.stream().anyMatch(p -> retourService.findByPret(p).isEmpty());
+            // 2. Vérifier qu'il n'existe pas de réservation active pour cet exemplaire
+            List<Reservation> reservations = reservationService.findAll();
+            boolean exemplaireReserve = reservations.stream().anyMatch(r -> r.getExemplaire().getIdExemplaire() == exemplaire.getIdExemplaire() && r.getStatut() != null && r.getStatut().getIdStatut() == 2);
+            if (exemplaireEnPret || exemplaireReserve) {
+                model.addAttribute("error", "Cet exemplaire n'est pas disponible : il est déjà réservé ou en prêt.");
+                model.addAttribute("adherants", adherantService.findAll());
+                model.addAttribute("typesPret", typePretService.findAll());
+                model.addAttribute("livre", livre);
+                model.addAttribute("exemplaires", exemplaireService.getExemplairesByLivre(livre));
+                return "form-pret";
+            }
             
             if (pret == null) {
                 model.addAttribute("adherants", adherantService.findAll());
