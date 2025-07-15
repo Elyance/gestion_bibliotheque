@@ -106,8 +106,8 @@ public class PretService {
     /**
      * Vérifie si un exemplaire est disponible (ni en prêt actif, ni réservé validé) à une date donnée
      */
-    public boolean isExemplaireDisponible(Exemplaire exemplaire, LocalDateTime dateDebut) {
-        return livreService.isDispo(exemplaire, dateDebut.toLocalDate());
+    public boolean isExemplaireDisponible(Exemplaire exemplaire, LocalDateTime dateDebut) {    
+        return livreService.isDispo(exemplaire, dateDebut.toLocalDate());   
     }
 
     /**

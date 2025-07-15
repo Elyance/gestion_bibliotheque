@@ -57,8 +57,8 @@ public class LivreService {
      * Vérifie si un exemplaire est disponible à une date donnée (ni en prêt actif, ni réservé validé)
      */
     public boolean isDispo(Exemplaire exemplaire, LocalDate date) {
-        // Vérifie prêt actif à la date donnée
         List<Pret> pretsExemplaire = pretService.findByExemplaire(exemplaire);
+        // Un exemplaire est dispo s'il n'est pas en prêt actif à la date donnée
         boolean exemplaireEnPret = pretsExemplaire.stream().anyMatch(p -> {
             LocalDate debut = toLocalDate(p.getDateDebut());
             LocalDate fin = (p.getRetour() != null) ? toLocalDate(p.getRetour().getDateRetour()) : null;
@@ -72,25 +72,19 @@ public class LivreService {
             }
         });
 
-        // Vérifie réservation validée à la date donnée
-        List<Reservation> reservations = reservationService.findAll();
-        boolean exemplaireReserve = reservations.stream().anyMatch(r -> {
-            boolean isValid = r.getExemplaire().getIdExemplaire() == exemplaire.getIdExemplaire()
-                    && r.getStatut() != null && r.getStatut().getIdStatut() == 2;
-            if (!isValid) return false;
-            LocalDate dateResa = toLocalDate(r.getDateReservation());
-            // On considère la réservation "active" à la date exacte de réservation
-            return dateResa != null && dateResa.equals(date);
-        });
-
-        return !(exemplaireEnPret || exemplaireReserve);
+        // Ignore les réservations
+        return !exemplaireEnPret;
     }
 
     /**
      * Utilitaire pour convertir java.util.Date en java.time.LocalDate
      */
-    private java.time.LocalDate toLocalDate(java.util.Date date) {
+    public static LocalDate toLocalDate(java.util.Date date) {
         if (date == null) return null;
-        return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+        if (date instanceof java.sql.Date) {
+            return ((java.sql.Date) date).toLocalDate();
+        } else {
+            return date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+        }
     }
 }

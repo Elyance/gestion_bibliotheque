@@ -61,4 +61,8 @@ public class ReservationService {
         return result;
     }
 
+    public List<Reservation> findByAdherant(Adherant adherant) {
+        return reservationRepository.findByAdherant(adherant);
+    }
+
 }

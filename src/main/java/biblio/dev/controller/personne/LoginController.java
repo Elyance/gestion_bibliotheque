@@ -52,4 +52,16 @@ public class LoginController {
         model.addAttribute("message", "Aucun rôle trouvé pour cet utilisateur");
         return "form-login";
     }
+
+    @GetMapping("/logout-admin")
+    public String logout(HttpServletRequest request) {
+        request.getSession().invalidate(); // Invalider la session pour déconnecter l'utilisateur
+        return "redirect:/login-admin"; // Rediriger vers la page de login
+    }
+
+    @GetMapping("/logout-adherant")
+    public String logoutAdherant(HttpServletRequest request) {
+        request.getSession().invalidate(); // Invalider la session pour déconnecter l'utilisateur
+        return "redirect:/login-adherant"; // Rediriger vers la page de login   
+    }
 }
