@@ -22,6 +22,10 @@ public class PenaliteService {
     public Penalite getDernierePenalite(Adherant adherant) {
         return penaliteRepository.getDernierePenalite(adherant);
     }
+
+    public void save(Penalite penalite) {
+        penaliteRepository.save(penalite);
+    }
     /**
      * Crée une pénalité si le retour est en retard
      */

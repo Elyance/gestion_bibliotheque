@@ -3,6 +3,8 @@ package biblio.dev.entity.description;
 import biblio.dev.entity.fonctionnalite.Reservation;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "Statut")
 public class Statut {
@@ -20,7 +22,7 @@ public class Statut {
         joinColumns = @JoinColumn(name = "idStatut"),
         inverseJoinColumns = @JoinColumn(name = "idReservation")
     )
-    private java.util.List<Reservation> reservations;
+    private List<Reservation> reservations;
 
     // Getters et setters
     public int getIdStatut() { return idStatut; }

@@ -30,7 +30,14 @@
                                 </p>
                                 <form action="reserver-livre" method="get">
                                     <input type="hidden" name="idLivre" value="${livre.idLivre}" />
-                                    <button type="submit" class="btn btn-success">Réserver</button>
+                                    <c:choose>
+                                        <c:when test="${autorisations[livre.idLivre]}">
+                                            <button type="submit" class="btn btn-success">Réserver</button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="text-danger">Vous ne pouvez pas réserver ce livre</span>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </form>
                             </div>
                         </div>

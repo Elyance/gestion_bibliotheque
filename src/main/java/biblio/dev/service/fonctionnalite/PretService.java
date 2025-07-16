@@ -49,6 +49,9 @@ public class PretService {
     @Autowired
     private biblio.dev.service.fonctionnalite.ReservationService reservationService;
 
+    @Autowired
+    private biblio.dev.service.fonctionnalite.JourFerierService jourFerierService;
+
     public List<Pret> findAll() {
         return pretRepository.findAll();
     }
@@ -106,8 +109,8 @@ public class PretService {
     /**
      * Vérifie si un exemplaire est disponible (ni en prêt actif, ni réservé validé) à une date donnée
      */
-    public boolean isExemplaireDisponible(Exemplaire exemplaire, LocalDateTime dateDebut) {
-        return livreService.isDispo(exemplaire, dateDebut.toLocalDate());
+    public boolean isExemplaireDisponible(Exemplaire exemplaire, LocalDateTime dateDebut) {    
+        return livreService.isDispo(exemplaire, dateDebut.toLocalDate());   
     }
 
     /**
@@ -119,39 +122,51 @@ public class PretService {
         Date dateDemande = Date.valueOf(dateDebut.toLocalDate());
         // Règle 0 : Disponibilité de l'exemplaire
         if (!isExemplaireDisponible(exemplaire, dateDebut)) {
-            model.addAttribute("error", "Cet exemplaire n'est pas disponible : il est déjà réservé ou en prêt.");
+            String msg = "Cet exemplaire n'est pas disponible : il est déjà réservé ou en prêt.";
+            System.out.println("Règle 0 échouée : " + msg);
+            model.addAttribute("error", msg);
             return null;
         }
-        // 1. Livre autorisé ?
-        if (!typeAdherantLivreService.isLivreAutorisePourAdherant(adherant, livre, dateDemande)) {
-            model.addAttribute("error", "Ce livre n'est pas autorisé pour cet adhérant à la date demandée.");
-            return null;
-        }
-        // 2. Âge
+        // 1. Âge
         int ageAdherant = personneService.getAgeById(adherant.getIdAdherant());
         if (ageAdherant < livre.getAgeLimite()) {
-            model.addAttribute("error", "L'âge minimum requis pour ce livre est de " + livre.getAgeLimite() + " ans.");
+            String msg = "L'âge minimum requis pour ce livre est de " + livre.getAgeLimite() + " ans.";
+            System.out.println("Règle 1 échouée : " + msg);
+            model.addAttribute("error", msg);
             return null;
         }
-        // 3. Quota
+        // 2. Quota
         int limite = regleNbLivreService.getLimitePourTypeAdherantAlaDate(adherant.getTypeAdherant(), dateDemande);
         int nbPretsActifs = this.countPretsEnCoursParAdherant(adherant);
         if (nbPretsActifs >= limite) {
-            model.addAttribute("error", "Limite de " + limite + " prêt(s) atteinte pour cet adhérant.");
+            String msg = "Limite de " + limite + " prêt(s) atteinte pour cet adhérant.";
+            System.out.println("Règle 2 échouée : " + msg);
+            model.addAttribute("error", msg);
             return null;
         }
-        // 4. Abonnement
+        // 3. Abonnement
         Date sqlDateDebut = Date.valueOf(dateDebut.toLocalDate());
         double dureeJour = regleDureeService.getDureePourTypeAdherantAlaDate(adherant.getTypeAdherant(), dateDebut.toLocalDate());
         java.time.LocalDateTime dateFin = dateDebut.plusDays((long) dureeJour);
-        Date sqlDateFin = Date.valueOf(dateFin.toLocalDate());
+
+        // Vérification jour férié pour la date de fin
+        java.sql.Date sqlDateFin = java.sql.Date.valueOf(dateFin.toLocalDate());
+        while (jourFerierService.isJourFerier(sqlDateFin)) {
+            dateFin = dateFin.plusDays(1);
+            sqlDateFin = java.sql.Date.valueOf(dateFin.toLocalDate());
+        }
+
         if (!adherantService.isAbonnee(sqlDateDebut, sqlDateFin, adherant)) {
-            model.addAttribute("error", "Cet adhérant n'est pas abonné durant toute la période de prêt.");
+            String msg = "Cet adhérant n'est pas abonné durant toute la période de prêt.";
+            System.out.println("Règle 3 échouée : " + msg);
+            model.addAttribute("error", msg);
             return null;
         }
-        // 5. Pénalité
+        // 4. Pénalité
         if (penaliteService.isPenaliseAlaDate(adherant, sqlDateDebut)) {
-            model.addAttribute("error", "Cet adhérant est pénalisé pendant la période demandée.");
+            String msg = "Cet adhérant est pénalisé pendant la période demandée.";
+            System.out.println("Règle 4 échouée : " + msg);
+            model.addAttribute("error", msg);
             return null;
         }
         // Si tout est OK, créer le prêt

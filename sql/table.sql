@@ -120,14 +120,6 @@ CREATE TABLE Pret(
    FOREIGN KEY(idExemplaire) REFERENCES Exemplaire(idExemplaire)
 );
 
-CREATE TABLE Prolongement(
-   idProlongement INT,
-   dateFin DATETIME NOT NULL,
-   idPret INT NOT NULL,
-   PRIMARY KEY(idProlongement),
-   FOREIGN KEY(idPret) REFERENCES Pret(idPret)
-);
-
 CREATE TABLE DemandeProlongement(
    idDemande INT,
    dateDemande DATE NOT NULL,
@@ -191,4 +183,21 @@ CREATE TABLE StatutReservation(
    PRIMARY KEY(idReservation, idStatut),
    FOREIGN KEY(idReservation) REFERENCES Reservation(idReservation),
    FOREIGN KEY(idStatut) REFERENCES Statut(idStatut)
+);
+
+CREATE TABLE QuotaReservation (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nbReservation INT NOT NULL
+);
+
+CREATE TABLE PenaliteQuota (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nbJourPenalite INT NOT NULL,
+    idTypeAdherant INT NOT NULL,
+    FOREIGN KEY(idTypeAdherant) REFERENCES TypeAdherant(idTypeAdherant)
+);
+
+CREATE TABLE JourFerier (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    date DATE NOT NULL
 );

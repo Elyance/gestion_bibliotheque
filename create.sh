@@ -20,6 +20,7 @@ mkdir -p "$webInfPath"
 # Création du fichier web.xml
 xmlPath="src/main/webapp/WEB-INF/web.xml"
 
+
 cat > "$xmlPath" << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
     <web-app xmlns="http://java.sun.com/xml/ns/j2ee"
