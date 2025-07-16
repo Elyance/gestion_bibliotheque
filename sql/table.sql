@@ -120,14 +120,6 @@ CREATE TABLE Pret(
    FOREIGN KEY(idExemplaire) REFERENCES Exemplaire(idExemplaire)
 );
 
-CREATE TABLE Prolongement(
-   idProlongement INT,
-   dateFin DATETIME NOT NULL,
-   idPret INT NOT NULL,
-   PRIMARY KEY(idProlongement),
-   FOREIGN KEY(idPret) REFERENCES Pret(idPret)
-);
-
 CREATE TABLE DemandeProlongement(
    idDemande INT,
    dateDemande DATE NOT NULL,
