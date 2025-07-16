@@ -1,3 +1,9 @@
+-- Catégories
+INSERT INTO Categorie (idCategorie, nomCategorie) VALUES
+(1, 'Littérature classique'),
+(2, 'Philosophie'),
+(3, 'Jeunesse / Fantastique');
+
 -- Livres
 INSERT INTO Livre (idLivre, titre, ISBN, Edition, Auteur, ageLimite) VALUES
 (1, 'Spring pour les nuls', 'ISBN001', 'Eyrolles', 'Dupont', 0),
@@ -40,3 +46,15 @@ INSERT INTO Statut (idStatut, nomStatut) VALUES
 (3, 'Refusé'),
 (4, 'Prêt'),
 (5, 'Expiré');
+
+-- Catégories
+INSERT INTO Categorie (idCategorie, nomCategorie) VALUES
+(1, 'Informatique'),
+(2, 'Littérature'),
+(3, 'Jeunesse');
+
+-- Association Livre-Categorie (si table de jointure existe, par exemple Livre_Categorie)
+INSERT INTO Livre_Categorie (idLivre, idCategorie) VALUES
+(1, 1), -- Spring pour les nuls -> Informatique
+(2, 1), -- Java Avancé -> Informatique
+(3, 3); -- Contes pour enfants -> Jeunesse

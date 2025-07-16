@@ -21,6 +21,9 @@
                 <a class="nav-link text-white" href="mes-prets"><i class="bi bi-book"></i> Mes prêts</a>
             </li>
             <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="abonnement-adherent"><i class="bi bi-box-arrow-right"></i> S'abonner</a>
+            </li>
+            <li class="nav-item mb-2">
                 <a class="nav-link text-white" href="logout-adherant"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
             </li>
         </ul>

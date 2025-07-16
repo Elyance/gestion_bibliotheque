@@ -69,7 +69,7 @@
                 <option value="">-- Sélectionner un adhérant --</option>
                 <c:forEach var="adherant" items="${adherants}">
                     <option value="${adherant.idAdherant}">
-                        ${adherant.personne.nom} (ID: ${adherant.idAdherant})
+                        ${adherant.personne.nom} (ID: ${adherant.idAdherant}, N°: ${adherant.numeroAdherant})
                     </option>
                 </c:forEach>
             </select>

@@ -184,3 +184,20 @@ CREATE TABLE StatutReservation(
    FOREIGN KEY(idReservation) REFERENCES Reservation(idReservation),
    FOREIGN KEY(idStatut) REFERENCES Statut(idStatut)
 );
+
+CREATE TABLE QuotaReservation (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nbReservation INT NOT NULL
+);
+
+CREATE TABLE PenaliteQuota (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nbJourPenalite INT NOT NULL,
+    idTypeAdherant INT NOT NULL,
+    FOREIGN KEY(idTypeAdherant) REFERENCES TypeAdherant(idTypeAdherant)
+);
+
+CREATE TABLE JourFerier (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    date DATE NOT NULL
+);

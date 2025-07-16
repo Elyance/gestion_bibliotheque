@@ -67,11 +67,14 @@ public class PretController {
     @PostMapping("/ajouterPret")
     public String ajouterPret(HttpServletRequest request, @SessionAttribute("adminConnecte") Admin admin, Model model) {
         try {
+            System.out.println("Début ajout prêt");
             int idAdherant = Integer.parseInt(request.getParameter("idAdherant"));
             int idTypePret = Integer.parseInt(request.getParameter("idTypePret"));
             int idLivre = Integer.parseInt(request.getParameter("idLivre"));
             String dateDebutStr = request.getParameter("dateDebut");
             String numeroExemplaire = request.getParameter("numeroExemplaire");
+            System.out.println("Paramètres reçus : idAdherant=" + idAdherant + ", idTypePret=" + idTypePret + ", idLivre=" + idLivre + ", dateDebut=" + dateDebutStr + ", numeroExemplaire=" + numeroExemplaire);
+
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
             LocalDateTime dateDebut = LocalDateTime.parse(dateDebutStr, formatter);
 
@@ -79,16 +82,20 @@ public class PretController {
             TypePret typePret = typePretService.findById(idTypePret).orElseThrow(() -> new RuntimeException("Type de prêt introuvable"));
             Exemplaire exemplaire = exemplaireService.getByNumero(numeroExemplaire).orElseThrow(() -> new RuntimeException("Exemplaire introuvable"));
             Livre livre = livreService.findById(idLivre).orElseThrow(() -> new RuntimeException("Livre non existant"));
+            System.out.println("Entités récupérées : adherant=" + adherant.getNumeroAdherant() + ", typePret=" + typePret.getNomType() + ", exemplaire=" + exemplaire.getNumero() + ", livre=" + livre.getTitre());
+
             Pret pret = pretService.verifierEtConstruirePret(adherant, exemplaire, typePret, admin, model, dateDebut);
-            
+            System.out.println("Pret construit : " + (pret != null ? "OK" : "NULL"));
+
             // Vérification disponibilité exemplaire
-            // 1. Vérifier qu'il n'existe pas de prêt actif pour cet exemplaire
             List<Pret> pretsExemplaire = pretService.findByExemplaire(exemplaire);
             boolean exemplaireEnPret = pretsExemplaire.stream().anyMatch(p -> retourService.findByPret(p).isEmpty());
-            // 2. Vérifier qu'il n'existe pas de réservation active pour cet exemplaire
             List<Reservation> reservations = reservationService.findAll();
             boolean exemplaireReserve = reservations.stream().anyMatch(r -> r.getExemplaire().getIdExemplaire() == exemplaire.getIdExemplaire() && r.getStatut() != null && r.getStatut().getIdStatut() == 2);
+            System.out.println("Exemplaire en prêt : " + exemplaireEnPret + ", Exemplaire réservé : " + exemplaireReserve);
+
             if (exemplaireEnPret || exemplaireReserve) {
+                System.out.println("Exemplaire non disponible");
                 model.addAttribute("error", "Cet exemplaire n'est pas disponible : il est déjà réservé ou en prêt.");
                 model.addAttribute("adherants", adherantService.findAll());
                 model.addAttribute("typesPret", typePretService.findAll());
@@ -96,8 +103,9 @@ public class PretController {
                 model.addAttribute("exemplaires", exemplaireService.getExemplairesByLivre(livre));
                 return "form-pret";
             }
-            
+
             if (pret == null) {
+                System.out.println("Pret null après vérification");
                 model.addAttribute("adherants", adherantService.findAll());
                 model.addAttribute("typesPret", typePretService.findAll());
                 model.addAttribute("livre", livre);
@@ -105,9 +113,11 @@ public class PretController {
                 return "form-pret";
             }
             pretService.save(pret);
+            System.out.println("Prêt enregistré avec succès.");
             model.addAttribute("succesInsertion", "Prêt enregistré avec succès.");
             return "redirect:/list-prets";
         } catch (Exception e) {
+            System.out.println("Erreur lors de l'enregistrement du prêt : " + e.getMessage());
             e.printStackTrace();
             model.addAttribute("erreurInsertion", "Erreur lors de l'enregistrement du prêt : " + e.getMessage());
             return "form-pret";

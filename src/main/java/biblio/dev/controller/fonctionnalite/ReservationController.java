@@ -17,6 +17,7 @@ import biblio.dev.service.personne.PersonneService;
 import biblio.dev.service.regle.RegleNbLivreService;
 import biblio.dev.service.personne.AdherantService;
 import biblio.dev.service.fonctionnalite.PenaliteService;
+import biblio.dev.service.fonctionnalite.QuotaReservationService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,6 +49,8 @@ public class ReservationController {
     private AdherantService adherantService;
     @Autowired
     private PenaliteService penaliteService;
+    @Autowired
+    private QuotaReservationService quotaReservationService;
 
     @GetMapping("/reserver-livre")
     public String showReservationForm(@RequestParam(value = "idLivre", required = false) Integer idLivre, Model model) {
@@ -85,11 +88,6 @@ public class ReservationController {
             Date dateReservation = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(dateReservationStr);
             // Vérification livre autorisé
             Livre livre = exemplaire.getLivre();
-            if (!typeAdherantLivreService.isLivreAutorisePourAdherant(adherant, livre, dateReservation)) {
-                model.addAttribute("error", "Ce livre n'est pas autorisé pour cet adhérant à la date demandée.");
-                model.addAttribute("exemplaires", exemplaires);
-                return "reserver-livre";
-            }
             // Vérification âge
             int ageAdherant = personneService.getAgeById(adherant.getIdAdherant());
             if (ageAdherant < livre.getAgeLimite()) {
@@ -110,6 +108,19 @@ public class ReservationController {
                 model.addAttribute("exemplaires", exemplaires);
                 return "reserver-livre";
             }
+            // Vérification du quota de réservation
+            long nbReservationsEnAttente = reservationService.findAll().stream()
+                .filter(r -> r.getAdherant().getIdAdherant() == adherant.getIdAdherant())
+                .filter(r -> r.getStatut() != null && r.getStatut().getIdStatut() == 1) // 1 = En attente
+                .count();
+
+            int quotaMax = quotaReservationService.getQuotaMax();
+            if (nbReservationsEnAttente >= quotaMax) {
+                model.addAttribute("error", "Quota de réservations en attente atteint (" + quotaMax + ").");
+                model.addAttribute("exemplaires", exemplaires);
+                return "reserver-livre";
+            }
+            
             // Création et sauvegarde de la réservation
             Reservation reservation = new Reservation();
             reservation.setAdherant(adherant);
