@@ -46,23 +46,60 @@
         .form-actions button:hover {
             background: #0056b3;
         }
+        .alert {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .alert-success {
+            color: #155724;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            color: #721c24;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .alert-warning {
+            color: #856404;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
 <div class="form-container">
     <h2>Enregistrer un Prêt</h2>
+    
+    <!-- Messages de succès -->
     <c:if test="${not empty succesInsertion}">
-        <div style="color: #155724; background: #d4edda; border: 1px solid #155724; padding: 10px; border-radius: 4px; margin-bottom: 18px; text-align: center;">
+        <div class="alert alert-success">
             ${succesInsertion}
         </div>
     </c:if>
+    
+    <!-- Messages d'erreur -->
     <c:if test="${not empty erreurInsertion}">
-        <div style="color: #b30000; background: #ffeaea; border: 1px solid #b30000; padding: 10px; border-radius: 4px; margin-bottom: 18px; text-align: center;">
+        <div class="alert alert-error">
             ${erreurInsertion}
         </div>
     </c:if>
+    
+    <c:if test="${not empty error}">
+        <div class="alert alert-error">
+            ${error}
+        </div>
+    </c:if>
+    
     <form action="ajouterPret" method="post">
         <input type="hidden" name="idLivre" value="${livre.idLivre}" />
+        
         <div class="form-group">
             <label for="idAdherant">Adhérant</label>
             <select name="idAdherant" id="idAdherant" required>
@@ -74,6 +111,7 @@
                 </c:forEach>
             </select>
         </div>
+        
         <div class="form-group">
             <label for="idTypePret">Type de Prêt</label>
             <select name="idTypePret" id="idTypePret" required>
@@ -85,55 +123,48 @@
                 </c:forEach>
             </select>
         </div>
+        
         <div class="form-group">
             <label for="dateDebut">Date de début</label>
             <input type="datetime-local" name="dateDebut" id="dateDebut" required>
         </div>
+        
         <div class="form-group" style="position:relative;">
-            <input type="hidden" name="idLivre" value="${livre.idLivre}" />
             <label for="numeroExemplaire">Numéro de l'exemplaire</label>
-            <input type="text" id="numeroExemplaire" name="numeroExemplaire" list="listeExemplaires" placeholder="Entrer le numéro de l'exemplaire" required>
-            <datalist id="listeExemplaires">
-                <c:forEach var="ex" items="${exemplaires}">
-                    <option value="${ex.numero}"></option>
-                </c:forEach>
-            </datalist>
+            <c:choose>
+                <c:when test="${empty exemplaires}">
+                    <div class="alert alert-warning">
+                        <strong>Aucun exemplaire disponible</strong> pour ce livre actuellement.
+                        <br>Tous les exemplaires sont en prêt.
+                    </div>
+                    <input type="text" id="numeroExemplaire" name="numeroExemplaire" 
+                           placeholder="Aucun exemplaire disponible" disabled>
+                </c:when>
+                <c:otherwise>
+                    <input type="text" id="numeroExemplaire" name="numeroExemplaire" 
+                           list="listeExemplaires" placeholder="Entrer le numéro de l'exemplaire" required>
+                    <datalist id="listeExemplaires">
+                        <c:forEach var="ex" items="${exemplaires}">
+                            <option value="${ex.numero}"></option>
+                        </c:forEach>
+                    </datalist>
+                </c:otherwise>
+            </c:choose>
         </div>
+        
         <div class="form-actions">
-            <button type="submit">Valider le prêt</button>
+            <c:choose>
+                <c:when test="${empty exemplaires}">
+                    <button type="button" disabled class="btn-secondary">
+                        Aucun exemplaire disponible
+                    </button>
+                </c:when>
+                <c:otherwise>
+                    <button type="submit">Valider le prêt</button>
+                </c:otherwise>
+            </c:choose>
         </div>
     </form>
 </div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('numeroExemplaire');
-    const suggestions = document.getElementById('suggestions');
-    input.addEventListener('input', function() {
-        const query = input.value;
-        if (query.length < 2) {
-            suggestions.innerHTML = '';
-            return;
-        }
-        fetch('/api/exemplaires/suggest?numero=' + encodeURIComponent(query))
-            .then(res => res.json())
-            .then(data => {
-                suggestions.innerHTML = '';
-                data.forEach(item => {
-                    const div = document.createElement('div');
-                    div.textContent = item.numero;
-                    div.style.cursor = 'pointer';
-                    div.onclick = () => {
-                        input.value = item.numero;
-                        suggestions.innerHTML = '';
-                    };
-                    suggestions.appendChild(div);
-                });
-            });
-    });
-    document.addEventListener('click', function(e) {
-        if (e.target !== input) suggestions.innerHTML = '';
-    });
-});
-</script>
 </body>
 </html>

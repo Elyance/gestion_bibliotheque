@@ -58,21 +58,42 @@ public class LivreService {
      */
     public boolean isDispo(Exemplaire exemplaire, LocalDate date) {
         List<Pret> pretsExemplaire = pretService.findByExemplaire(exemplaire);
-        // Un exemplaire est dispo s'il n'est pas en prêt actif à la date donnée
+        
+        System.out.println("=== DEBUG isDispo ===");
+        System.out.println("Exemplaire: " + exemplaire.getNumero());
+        System.out.println("Date vérifiée: " + date);
+        System.out.println("Nombre de prêts: " + pretsExemplaire.size());
+        
+        // Un exemplaire est disponible s'il n'a aucun prêt actif à la date donnée
         boolean exemplaireEnPret = pretsExemplaire.stream().anyMatch(p -> {
             LocalDate debut = toLocalDate(p.getDateDebut());
-            LocalDate fin = (p.getRetour() != null) ? toLocalDate(p.getRetour().getDateRetour()) : null;
-            if (debut == null) return false;
-            if (fin != null) {
-                // Prêt terminé : la date doit être dans l'intervalle
-                return !date.isBefore(debut) && !date.isAfter(fin);
+            
+            System.out.println("  Prêt " + p.getIdPret() + " - Début: " + debut);
+            System.out.println("  Retour: " + (p.getRetour() != null ? p.getRetour().getDateRetour() : "null"));
+            
+            if (debut == null || date.isBefore(debut)) {
+                System.out.println("  -> Prêt pas encore commencé");
+                return false; // Prêt pas encore commencé
+            }
+            
+            if (p.getRetour() != null) {
+                // Prêt retourné : actif seulement entre début et retour
+                LocalDate dateRetour = toLocalDate(p.getRetour().getDateRetour());
+                System.out.println("  -> Prêt retourné le: " + dateRetour);
+                
+                // CORRECTION: Un prêt retourné est actif si date >= début ET date <= retour
+                boolean pretActif = !date.isBefore(debut) && !date.isAfter(dateRetour);
+                System.out.println("  -> Prêt actif à cette date: " + pretActif);
+                return pretActif;
             } else {
-                // Prêt non retourné : la date doit être après le début
-                return !date.isBefore(debut);
+                // Prêt non retourné : actif depuis le début
+                System.out.println("  -> Prêt non retourné, actif depuis le début");
+                return true;
             }
         });
 
-        // Ignore les réservations
+        System.out.println("Exemplaire en prêt: " + exemplaireEnPret);
+        System.out.println("Exemplaire disponible: " + !exemplaireEnPret);
         return !exemplaireEnPret;
     }
 

@@ -114,7 +114,7 @@ public class ReservationController {
                 .filter(r -> r.getStatut() != null && r.getStatut().getIdStatut() == 1) // 1 = En attente
                 .count();
 
-            int quotaMax = quotaReservationService.getQuotaMax();
+            int quotaMax = quotaReservationService.getQuotaMax(adherant.getTypeAdherant());
             if (nbReservationsEnAttente >= quotaMax) {
                 model.addAttribute("error", "Quota de réservations en attente atteint (" + quotaMax + ").");
                 model.addAttribute("exemplaires", exemplaires);

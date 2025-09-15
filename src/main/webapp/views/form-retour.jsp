@@ -16,6 +16,22 @@
             </div>
             <div class="card-body">
 
+                <!-- Messages d'erreur -->
+                <c:if test="${not empty erreur}">
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        ${erreur}
+                    </div>
+                </c:if>
+
+                <!-- Messages de succès -->
+                <c:if test="${not empty succes}">
+                    <div class="alert alert-success" role="alert">
+                        <i class="bi bi-check-circle"></i>
+                        ${succes}
+                    </div>
+                </c:if>
+
                 <form action="${pageContext.request.contextPath}/retourner" method="post">
                     <!-- Champ caché -->
                     <input type="hidden" name="idPret" value="${idPret}" />

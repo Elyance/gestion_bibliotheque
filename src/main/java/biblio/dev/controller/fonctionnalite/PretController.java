@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import biblio.dev.entity.livre.Livre;
 import biblio.dev.entity.livre.Exemplaire;
@@ -40,8 +41,36 @@ public class PretController {
         Optional<Livre> livreOptional = livreService.findById(idLivre);
         if (!livreOptional.isPresent()) return "redirect:/list-livres";
         Livre livre = livreOptional.get();
+        
+        // Récupérer tous les exemplaires du livre
+        List<Exemplaire> tousExemplaires = exemplaireService.getExemplairesByLivre(livre);
+        
+        // Filtrer pour ne garder que les exemplaires disponibles (pas en prêt)
+        List<Exemplaire> exemplairesDisponibles = tousExemplaires.stream()
+            .filter(exemplaire -> {
+                // Vérifier si l'exemplaire n'est pas en prêt actuel
+                List<Pret> pretsExemplaire = pretService.findByExemplaire(exemplaire);
+                // Un exemplaire est DISPONIBLE s'il n'a AUCUN prêt non retourné
+                return pretsExemplaire.stream()
+                    .allMatch(p -> retourService.findByPret(p).isPresent()); // Tous les prêts sont retournés
+            })
+            .collect(Collectors.toList());
+        
+        System.out.println("=== DEBUG EXEMPLAIRES DISPONIBLES ===");
+        System.out.println("Livre: " + livre.getTitre());
+        System.out.println("Tous exemplaires: " + tousExemplaires.size());
+        System.out.println("Exemplaires disponibles: " + exemplairesDisponibles.size());
+        
+        for (Exemplaire ex : tousExemplaires) {
+            List<Pret> pretsEx = pretService.findByExemplaire(ex);
+            long pretsNonRetournes = pretsEx.stream()
+                .filter(p -> retourService.findByPret(p).isEmpty())
+                .count();
+            System.out.println("Exemplaire " + ex.getNumero() + " - Prêts non retournés: " + pretsNonRetournes);
+        }
+        
         model.addAttribute("livre", livre);
-        model.addAttribute("exemplaires", exemplaireService.getExemplairesByLivre(livre));
+        model.addAttribute("exemplaires", exemplairesDisponibles);
         model.addAttribute("adherants", adherantService.findAll());
         model.addAttribute("typesPret", typePretService.findAll());
         return "form-pret";
@@ -84,6 +113,8 @@ public class PretController {
             Livre livre = livreService.findById(idLivre).orElseThrow(() -> new RuntimeException("Livre non existant"));
             System.out.println("Entités récupérées : adherant=" + adherant.getNumeroAdherant() + ", typePret=" + typePret.getNomType() + ", exemplaire=" + exemplaire.getNumero() + ", livre=" + livre.getTitre());
 
+
+
             Pret pret = pretService.verifierEtConstruirePret(adherant, exemplaire, typePret, admin, model, dateDebut);
             System.out.println("Pret construit : " + (pret != null ? "OK" : "NULL"));
 
@@ -94,7 +125,7 @@ public class PretController {
             boolean exemplaireReserve = reservations.stream().anyMatch(r -> r.getExemplaire().getIdExemplaire() == exemplaire.getIdExemplaire() && r.getStatut() != null && r.getStatut().getIdStatut() == 2);
             System.out.println("Exemplaire en prêt : " + exemplaireEnPret + ", Exemplaire réservé : " + exemplaireReserve);
 
-            if (exemplaireEnPret || exemplaireReserve) {
+            if (exemplaireEnPret) {
                 System.out.println("Exemplaire non disponible");
                 model.addAttribute("error", "Cet exemplaire n'est pas disponible : il est déjà réservé ou en prêt.");
                 model.addAttribute("adherants", adherantService.findAll());

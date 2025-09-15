@@ -120,13 +120,6 @@ public class PretService {
     public Pret verifierEtConstruirePret(Adherant adherant, Exemplaire exemplaire, TypePret typePret, Admin admin, Model model, LocalDateTime dateDebut) {
         Livre livre = exemplaire.getLivre();
         Date dateDemande = Date.valueOf(dateDebut.toLocalDate());
-        // Règle 0 : Disponibilité de l'exemplaire
-        if (!isExemplaireDisponible(exemplaire, dateDebut)) {
-            String msg = "Cet exemplaire n'est pas disponible : il est déjà réservé ou en prêt.";
-            System.out.println("Règle 0 échouée : " + msg);
-            model.addAttribute("error", msg);
-            return null;
-        }
         // 1. Âge
         int ageAdherant = personneService.getAgeById(adherant.getIdAdherant());
         if (ageAdherant < livre.getAgeLimite()) {

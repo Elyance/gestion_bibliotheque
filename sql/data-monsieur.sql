@@ -23,7 +23,7 @@ INSERT INTO Exemplaire (idExemplaire, numero, idLivre) VALUES
 (3, 'MIS003', 1),
 (4, 'ETR001', 2),
 (5, 'ETR002', 2),
-(6, 'HAR001', 1);
+(6, 'HAR001', 3);
 
 -- Types d'adhérents
 INSERT INTO TypeAdherant (idTypeAdherant, nomTypeAdherant) VALUES
@@ -53,6 +53,13 @@ INSERT INTO Adherant (idAdherant, idPersonne, idTypeAdherant, numero_adherant) V
 (6, 6, 2, 'ENS003'), -- Salima Touhami, Enseignant
 (7, 7, 3, 'PROF001'), -- Rachid El Mansouri, Professionnel
 (8, 8, 3, 'PROF002'); -- Amina Zerouali, Professionnel
+
+INSERT INTO Statut (idStatut, nomStatut) VALUES
+(1, 'En attente'),
+(2, 'Validé'),
+(3, 'Refusé'),
+(4, 'Prêt'),
+(5, 'Expiré');
 
 INSERT INTO Admin (idAdmin, idPersonne) VALUES
 (1, 9);  -- Rakoto est admin email: rakoto@example.com  ,mdp: admin123
@@ -86,6 +93,32 @@ INSERT INTO RegleDuree (idRegleDuree, duree, date, idTypeAdherant) VALUES
 (2, 9, '2025-01-01', 2), -- Enseignant (ENS001, ENS002, ENS003)
 (3, 12, '2025-01-01', 3); -- Professionnel (PROF001, PROF002)
 
+INSERT INTO JourFerier (id, date) VALUES
+(1, '2025-07-13'), -- Dimanche
+(2, '2025-07-19'), -- Jour férié
+(3, '2025-07-20'), -- Dimanche
+(4, '2025-07-26'), -- Jour férié
+(5, '2025-07-27'), -- Dimanche
+(6, '2025-08-03'), -- Dimanche
+(7, '2025-08-10'), -- Dimanche
+(8, '2025-08-17'); -- Dimanche
 
+INSERT INTO PenaliteQuota (id, nbJourPenalite, idTypeAdherant) VALUES
+(1, 10, 1), -- Etudiant : 10 jours de pénalité
+(2, 9, 2), -- Enseignant : 9 jours de pénalité
+(3, 8, 3); -- Professionnel : 8 jours de pénalité
 
+-- À ajouter à la fin de ton fichier data-monsieur.sql :
+
+-- Quotas de réservation par type d'adhérant
+INSERT INTO QuotaReservation (id, nbReservation, idTypeAdherant) VALUES
+(1, 1, 1), -- Etudiant : 1 réservation
+(2, 2, 2), -- Enseignant : 2 réservations
+(3, 3, 3); -- Professionnel : 3 réservations
+
+-- Quotas de prolongement par type d'adhérant
+INSERT INTO QuotaProlongement (id, nbProlongement, idTypeAdherant) VALUES
+(1, 3, 1), -- Etudiant : 3 prolongements
+(2, 5, 2), -- Enseignant : 5 prolongements
+(3, 7, 3); -- Professionnel : 7 prolongements
 
